@@ -18,6 +18,8 @@ namespace Game {
 
         int width, height;
 
+        Camera camera;
+
         int VAO;
         int VBO;
         int EBO;
@@ -30,24 +32,82 @@ namespace Game {
 
         Shader shader_program;
 
-        float[] vertices = {
-            -0.5f,  0.5f, 0f, // top left vertex - 0
-             0.5f,  0.5f, 0f, // top right vertex - 1
-             0.5f, -0.5f, 0f, // bottom right vertex - 2
-            -0.5f, -0.5f, 0f // bottom left vertex - 3
+        private int frame_сount = 0;  // Счётчик кадров
+        private float time_elapsed = 0f;  // Время прошедшее с последнего расчёта FPS
+        private float fps = 0f;  // Текущее значение FPS
+
+        List<Vector3> vertices = new List<Vector3>() {
+            new Vector3(-0.5f,  0.5f, 0.5f), //top-left-front vertice
+            new Vector3( 0.5f,  0.5f, 0.5f), //top-right-front vertice
+            new Vector3( 0.5f, -0.5f, 0.5f), //bottom-right-front vertice
+            new Vector3(-0.5f, -0.5f, 0.5f), //bottom-left-front vertice
+
+            new Vector3(-0.5f,  0.5f, -0.5f), //top-left-back vertice
+            new Vector3( 0.5f,  0.5f, -0.5f), //top-right-back vertice
+            new Vector3( 0.5f, -0.5f, -0.5f), //bottom-right-back vertice
+            new Vector3(-0.5f, -0.5f, -0.5f), //bottom-left-back vertice
         };
+
 
         uint[] indices = {
+            // front
             0, 1, 2, // top triangle
-            2, 3, 0 // bottom triangle
+            2, 3, 0, // bottom triangle
+
+            // right
+            1, 5, 6,
+            6, 2, 1,
+
+            // back
+            5, 4 ,7,
+            7, 6, 5,
+
+            // left
+            4, 0, 3,
+            3, 7, 4,
+
+            // up
+            1, 5, 4,
+            4, 0, 1,
+
+            // down
+            2, 6, 7,
+            7, 3, 2
+
         };
 
-        float[] texCoords = {
-            0f, 1f,
-            1f, 1f,
-            1f, 0f,
-            0f, 0f
+        List<Vector2> texture_coords = new List<Vector2>() {
+            new Vector2(0f, 1f),
+            new Vector2(1f, 1f),
+            new Vector2(1f, 0f),
+            new Vector2(0f, 0f),
+
+            new Vector2(0f, 1f),
+            new Vector2(1f, 1f),
+            new Vector2(1f, 0f),
+            new Vector2(0f, 0f),
+
+            new Vector2(0f, 1f),
+            new Vector2(1f, 1f),
+            new Vector2(1f, 0f),
+            new Vector2(0f, 0f),
+
+            new Vector2(0f, 1f),
+            new Vector2(1f, 1f),
+            new Vector2(1f, 0f),
+            new Vector2(0f, 0f),
+
+            new Vector2(0f, 1f),
+            new Vector2(1f, 1f),
+            new Vector2(1f, 0f),
+            new Vector2(0f, 0f),
+
+            new Vector2(0f, 1f),
+            new Vector2(1f, 1f),
+            new Vector2(1f, 0f),
+            new Vector2(0f, 0f),
         };
+
 
 
         public Game(int width, int height) : base (GameWindowSettings.Default,
@@ -70,7 +130,7 @@ namespace Game {
             // Создание и настройка VBO для вершин
             VBO = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes, vertices.ToArray(), BufferUsageHint.StaticDraw);
 
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(0);
@@ -83,7 +143,7 @@ namespace Game {
             // Создание и настройка VBO для текстурных координат
             texture_VBO = GL.GenBuffer();
             GL.BindBuffer(BufferTarget.ArrayBuffer, texture_VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, texCoords.Length * sizeof(float), texCoords, BufferUsageHint.StaticDraw);
+            GL.BufferData(BufferTarget.ArrayBuffer, texture_coords.Count * Vector3.SizeInBytes, texture_coords.ToArray(), BufferUsageHint.StaticDraw);
 
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexArrayAttrib(VAO, 1);
@@ -137,6 +197,10 @@ namespace Game {
             GL.BindTexture(TextureTarget.Texture2D, 0);
 
             shader_program.loadShader();
+
+            GL.Enable(EnableCap.DepthTest);
+
+            camera = new Camera(width, height, Vector3.Zero);
         }
 
         // Очистка ресурсов OpenGL
@@ -154,6 +218,27 @@ namespace Game {
         // Рендер изображения
         protected override void OnRenderFrame(FrameEventArgs args) {
 
+            MouseState mouse = MouseState;
+            KeyboardState input = KeyboardState;
+            base.OnUpdateFrame(args);
+
+            camera.Update(input, mouse, args);
+
+            frame_сount++;
+
+            // Обновляем время, прошедшее с последнего кадра
+            time_elapsed += (float)args.Time;
+
+            // Когда прошло 1 секунда (или более), рассчитываем FPS
+            if (time_elapsed >= 1.0f) {
+                fps = frame_сount;  // FPS = количество кадров за секунду
+                Console.WriteLine($"FPS: {fps}");  // Выводим FPS в консоль
+
+                // Сбрасываем счётчик и время
+                frame_сount = 0;
+                time_elapsed = 0f;
+            }
+
             y_rot += rotation_speed * (float)args.Time;
 
             if (y_rot >= 360f) {
@@ -161,24 +246,19 @@ namespace Game {
             }
 
             GL.ClearColor(0.3f, 0.3f, 1f, 1f);
-            GL.Clear(ClearBufferMask.ColorBufferBit);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
             shader_program.useShader();
 
             GL.BindTexture(TextureTarget.Texture2D, texture_ID);
 
-            //Transformation
+            // Трансформация
             Matrix4 model = Matrix4.CreateRotationY(y_rot);
-            Matrix4 translation = Matrix4.CreateTranslation(0f, 0f, -1f);
+            Matrix4 translation = Matrix4.CreateTranslation(0f, 0f, -2f);
             model *= translation;
 
-            Matrix4 view = Matrix4.Identity;
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(
-                MathHelper.DegreesToRadians(60.0f),
-                width / height,
-                0.1f,
-                100.0f
-            );
+            Matrix4 view = camera.GetViewMatrix();
+            Matrix4 projection = camera.GetProjection();
 
             int modelLocation = GL.GetUniformLocation(shader_program.shader_handle, "model");
             int viewLocation = GL.GetUniformLocation(shader_program.shader_handle, "view");
@@ -194,8 +274,6 @@ namespace Game {
             GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
             Context.SwapBuffers();
-
-            base.OnRenderFrame(args);
         }
 
         // Отображение изображения
