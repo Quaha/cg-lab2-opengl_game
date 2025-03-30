@@ -25,6 +25,9 @@ namespace Game {
         int texture_ID;
         int texture_VBO;
 
+        float y_rot = 0f;
+        float rotation_speed = 2f;
+
         Shader shader_program;
 
         float[] vertices = {
@@ -150,6 +153,13 @@ namespace Game {
 
         // Рендер изображения
         protected override void OnRenderFrame(FrameEventArgs args) {
+
+            y_rot += rotation_speed * (float)args.Time;
+
+            if (y_rot >= 360f) {
+                y_rot -= 360f;
+            }
+
             GL.ClearColor(0.3f, 0.3f, 1f, 1f);
             GL.Clear(ClearBufferMask.ColorBufferBit);
 
@@ -157,11 +167,31 @@ namespace Game {
 
             GL.BindTexture(TextureTarget.Texture2D, texture_ID);
 
+            //Transformation
+            Matrix4 model = Matrix4.CreateRotationY(y_rot);
+            Matrix4 translation = Matrix4.CreateTranslation(0f, 0f, -1f);
+            model *= translation;
+
+            Matrix4 view = Matrix4.Identity;
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(
+                MathHelper.DegreesToRadians(60.0f),
+                width / height,
+                0.1f,
+                100.0f
+            );
+
+            int modelLocation = GL.GetUniformLocation(shader_program.shader_handle, "model");
+            int viewLocation = GL.GetUniformLocation(shader_program.shader_handle, "view");
+            int projectionLocation = GL.GetUniformLocation(shader_program.shader_handle, "projection");
+
+            GL.UniformMatrix4(modelLocation, true, ref model);
+            GL.UniformMatrix4(viewLocation, true, ref view);
+            GL.UniformMatrix4(projectionLocation, true, ref projection);
+
             GL.BindVertexArray(VAO);
-
             GL.BindBuffer(BufferTarget.ElementArrayBuffer, EBO);
-            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
+            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
             Context.SwapBuffers();
 

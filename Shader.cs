@@ -14,7 +14,7 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 namespace Game {
     class Shader {
 
-        int shader_handle;
+        public int shader_handle;
 
         // Загрузка, компиляция и линковка шейдеров программы
         public void loadShader() {
