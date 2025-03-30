@@ -18,13 +18,20 @@ namespace Game {
 
         int VAO;
         int VBO;
+        int EBO;
 
         Shader shader_program;
 
         float[] vertices = {
-               0f,  0.5f, 0f, //top vertex
-            -0.5f, -0.5f, 0f, //bottom left vertex
-             0.5f, -0.5f, 0f //bottom right vertex
+            -0.5f,  0.5f, 0f, // top left vertex - 0
+             0.5f,  0.5f, 0f, // top right vertex - 1
+             0.5f, -0.5f, 0f, // bottom right vertex - 2
+            -0.5f, -0.5f, 0f // bottom left vertex - 3
+        };
+
+        uint[] indices = {
+            0, 1, 2, // top triangle
+            2, 3, 0 // bottom triangle
         };
 
 
@@ -50,6 +57,12 @@ namespace Game {
             GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
 
+            // Создание и привязка EBO
+            EBO = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, EBO);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
+
             // Указание атрибутов вершин
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
@@ -64,6 +77,7 @@ namespace Game {
         protected override void OnUnload() {
             GL.DeleteBuffer(VAO);
             GL.DeleteBuffer(VBO);
+            GL.DeleteBuffer(EBO);
 
             shader_program.deleteShader();
         }
@@ -76,7 +90,10 @@ namespace Game {
             shader_program.useShader();
 
             GL.BindVertexArray(VAO);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, EBO);
+            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+
 
             Context.SwapBuffers();
 
