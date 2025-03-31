@@ -19,16 +19,13 @@ namespace Game {
         int width, height;
 
         Camera camera;
-
+       
         int VAO;
         int VBO;
         int EBO;
 
         int texture_ID;
         int texture_VBO;
-
-        float y_rot = 0f;
-        float rotation_speed = 2f;
 
         Shader shader_program;
 
@@ -42,10 +39,30 @@ namespace Game {
             new Vector3( 0.5f, -0.5f, 0.5f), //bottom-right-front vertice
             new Vector3(-0.5f, -0.5f, 0.5f), //bottom-left-front vertice
 
-            new Vector3(-0.5f,  0.5f, -0.5f), //top-left-back vertice
-            new Vector3( 0.5f,  0.5f, -0.5f), //top-right-back vertice
-            new Vector3( 0.5f, -0.5f, -0.5f), //bottom-right-back vertice
-            new Vector3(-0.5f, -0.5f, -0.5f), //bottom-left-back vertice
+            new Vector3(0.5f, 0.5f, 0.5f), //top-left-back vertice
+            new Vector3(0.5f, 0.5f, -0.5f), //top-right-back vertice
+            new Vector3(0.5f, -0.5f,  -0.5f), //bottom-right-back vertice
+            new Vector3(0.5f, -0.5f,  0.5f), //bottom-left-back vertice
+
+            new Vector3(0.5f,  0.5f, -0.5f), //top-left-back vertice
+            new Vector3(-0.5f,  0.5f, -0.5f), //top-right-back vertice
+            new Vector3(-0.5f,  -0.5f, -0.5f), //bottom-right-back vertice
+            new Vector3(0.5f, -0.5f, -0.5f), //bottom-left-back vertice
+        
+            new Vector3(-0.5f, 0.5f, -0.5f), //top-right-back vertice
+            new Vector3(-0.5f, 0.5f, 0.5f), //top-left-back vertice
+            new Vector3(-0.5f, -0.5f,  0.5f), //bottom-left-back vertice
+            new Vector3(-0.5f, -0.5f,  -0.5f), //bottom-right-back vertice
+
+            new Vector3(-0.5f, 0.5f, -0.5f), //top-right-back vertice
+            new Vector3(0.5f, 0.5f, -0.5f), //top-left-back vertice
+            new Vector3(0.5f, 0.5f,  0.5f), //bottom-left-back vertice
+            new Vector3(-0.5f, 0.5f,  0.5f), //bottom-right-back vertice
+
+            new Vector3(-0.5f, -0.5f, -0.5f), //top-right-back vertice
+            new Vector3(0.5f, -0.5f, -0.5f), //top-left-back vertice
+            new Vector3(0.5f, -0.5f,  0.5f), //bottom-left-back vertice
+            new Vector3(-0.5f, -0.5f,  0.5f), //bottom-right-back vertice
         };
 
 
@@ -55,24 +72,24 @@ namespace Game {
             2, 3, 0, // bottom triangle
 
             // right
-            1, 5, 6,
-            6, 2, 1,
+            4, 5, 6,
+            6, 7, 4,
 
             // back
-            5, 4 ,7,
-            7, 6, 5,
+            8, 9, 10,
+            10, 11, 8,
 
             // left
-            4, 0, 3,
-            3, 7, 4,
+            12, 13, 14,
+            14, 15, 12,
 
             // up
-            1, 5, 4,
-            4, 0, 1,
+            16, 17, 18,
+            18, 19, 16,
 
             // down
-            2, 6, 7,
-            7, 3, 2
+            20, 21, 22,
+            22, 23, 20,
 
         };
 
@@ -122,6 +139,8 @@ namespace Game {
         // Инициализация ресурсов OpenGL
         protected override void OnLoad() {
             base.OnLoad();
+
+            this.CursorState = CursorState.Grabbed;
 
             // Создание и привязка VAO
             VAO = GL.GenVertexArray();
@@ -239,12 +258,6 @@ namespace Game {
                 time_elapsed = 0f;
             }
 
-            y_rot += rotation_speed * (float)args.Time;
-
-            if (y_rot >= 360f) {
-                y_rot -= 360f;
-            }
-
             GL.ClearColor(0.3f, 0.3f, 1f, 1f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
@@ -253,7 +266,7 @@ namespace Game {
             GL.BindTexture(TextureTarget.Texture2D, texture_ID);
 
             // Трансформация
-            Matrix4 model = Matrix4.CreateRotationY(y_rot);
+            Matrix4 model = Matrix4.CreateRotationY(0);
             Matrix4 translation = Matrix4.CreateTranslation(0f, 0f, -2f);
             model *= translation;
 
