@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 
 using StbImageSharp;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Game {
     class Game : GameWindow {
@@ -20,18 +22,15 @@ namespace Game {
 
         Camera camera;
        
-        int VAO;
-        int VBO;
-        int EBO;
+        ArrayObject VAO;
+        BufferObject VBO;
+        BufferObject EBO;
 
         int texture_ID;
-        int texture_VBO;
+        BufferObject texture_VBO;
 
         Shader shader_program;
-
-        private int frame_сount = 0;  // Счётчик кадров
-        private float time_elapsed = 0f;  // Время прошедшее с последнего расчёта FPS
-        private float fps = 0f;  // Текущее значение FPS
+        FrameCounter fps_counter;
 
         List<Vector3> vertices = new List<Vector3>() {
             new Vector3(-0.5f,  0.5f, 0.5f), //top-left-front vertice
@@ -64,7 +63,6 @@ namespace Game {
             new Vector3(0.5f, -0.5f,  0.5f), //bottom-left-back vertice
             new Vector3(-0.5f, -0.5f,  0.5f), //bottom-right-back vertice
         };
-
 
         uint[] indices = {
             // front
@@ -125,51 +123,43 @@ namespace Game {
             new Vector2(0f, 0f),
         };
 
+        public Game(int width, int height) : base(
+            new GameWindowSettings(),
+            new NativeWindowSettings {Title = "Art Gallery"})
+        {
+            CenterWindow(new Vector2i(width, height));
 
-
-        public Game(int width, int height) : base (GameWindowSettings.Default,
-                                                   NativeWindowSettings.Default) {
-            this.CenterWindow(new Vector2i(width, height));
-            this.height = height;
             this.width = width;
+            this.height = height;
 
             shader_program = new Shader();
+            fps_counter = new FrameCounter();
+            camera = new Camera(width, height, Vector3.Zero);
         }
 
-        // Инициализация ресурсов OpenGL
         protected override void OnLoad() {
             base.OnLoad();
 
-            this.CursorState = CursorState.Grabbed;
+            CursorState = CursorState.Grabbed;
 
             // Создание и привязка VAO
-            VAO = GL.GenVertexArray();
-            GL.BindVertexArray(VAO);
+            VAO = new ArrayObject();
 
             // Создание и настройка VBO для вершин
-            VBO = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes, vertices.ToArray(), BufferUsageHint.StaticDraw);
+            VBO = new BufferObject(BufferType.ArrayBuffer);
+            VBO.setData(vertices.ToArray(), BufferHint.StaticDraw);
 
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-            GL.EnableVertexAttribArray(0);
+            VAO.setVertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
 
-            // Привязываем EBO
-            EBO = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, EBO);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
+            // Создание и настройка EBO
+            EBO = new BufferObject(BufferType.ElementBuffer);
+            EBO.setData(indices, BufferHint.StaticDraw);
 
             // Создание и настройка VBO для текстурных координат
-            texture_VBO = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, texture_VBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, texture_coords.Count * Vector3.SizeInBytes, texture_coords.ToArray(), BufferUsageHint.StaticDraw);
+            texture_VBO = new BufferObject(BufferType.ArrayBuffer);
+            texture_VBO.setData(texture_coords.ToArray(), BufferHint.StaticDraw);
 
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
-            GL.EnableVertexArrayAttrib(VAO, 1);
-
-            // Отвязываем VAO и VBO
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindVertexArray(0);
+            VAO.setVertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
 
             // Загрузка текстуры
             texture_ID = GL.GenTexture(); // Создание пустой текстуры
@@ -218,44 +208,33 @@ namespace Game {
             shader_program.loadShader();
 
             GL.Enable(EnableCap.DepthTest);
-
-            camera = new Camera(width, height, Vector3.Zero);
         }
 
-        // Очистка ресурсов OpenGL
         protected override void OnUnload() {
-            GL.DeleteBuffer(VAO);
-            GL.DeleteBuffer(VBO);
-            GL.DeleteBuffer(EBO);
+
+            VAO.delete();
+
+            VBO.delete();
+            EBO.delete();
 
             GL.DeleteTexture(texture_ID);
-            GL.DeleteBuffer(texture_VBO);
+
+            texture_VBO.delete();
 
             shader_program.deleteShader();
         }
 
-        // Рендер изображения
         protected override void OnRenderFrame(FrameEventArgs args) {
 
             MouseState mouse = MouseState;
             KeyboardState input = KeyboardState;
             base.OnUpdateFrame(args);
 
-            camera.Update(input, mouse, args);
+            camera.update(input, mouse, args);
 
-            frame_сount++;
-
-            // Обновляем время, прошедшее с последнего кадра
-            time_elapsed += (float)args.Time;
-
-            // Когда прошло 1 секунда (или более), рассчитываем FPS
-            if (time_elapsed >= 1.0f) {
-                fps = frame_сount;  // FPS = количество кадров за секунду
-                Console.WriteLine($"FPS: {fps}");  // Выводим FPS в консоль
-
-                // Сбрасываем счётчик и время
-                frame_сount = 0;
-                time_elapsed = 0f;
+            fps_counter.updateCounter((float)args.Time);
+            if (fps_counter.canGetFPS()) {
+                Console.WriteLine($"FPS: {fps_counter.getFPS()}");
             }
 
             GL.ClearColor(0.3f, 0.3f, 1f, 1f);
@@ -270,8 +249,8 @@ namespace Game {
             Matrix4 translation = Matrix4.CreateTranslation(0f, 0f, -2f);
             model *= translation;
 
-            Matrix4 view = camera.GetViewMatrix();
-            Matrix4 projection = camera.GetProjection();
+            Matrix4 view = camera.getViewMatrix();
+            Matrix4 projection = camera.getProjection();
 
             int modelLocation = GL.GetUniformLocation(shader_program.shader_handle, "model");
             int viewLocation = GL.GetUniformLocation(shader_program.shader_handle, "view");
@@ -281,15 +260,11 @@ namespace Game {
             GL.UniformMatrix4(viewLocation, true, ref view);
             GL.UniformMatrix4(projectionLocation, true, ref projection);
 
-            GL.BindVertexArray(VAO);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, EBO);
-
             GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
             Context.SwapBuffers();
         }
 
-        // Отображение изображения
         protected override void OnUpdateFrame(FrameEventArgs args) {
             if (KeyboardState.IsKeyDown(Keys.Escape)) {
                 Close();
@@ -299,7 +274,9 @@ namespace Game {
 
         protected override void OnResize(ResizeEventArgs e) {
             base.OnResize(e);
+
             GL.Viewport(0, 0, e.Width, e.Height);
+
             this.width = e.Width;
             this.height = e.Height;
         }
