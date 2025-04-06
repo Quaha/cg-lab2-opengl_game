@@ -18,14 +18,14 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace Game {
     class Game : GameWindow {
 
-        int width, height;
+        protected int width, height;
 
-        Camera camera;
+        protected Camera camera;
 
-        GameObject cube;
+        protected List<GameObject> game_objects;
 
-        Shader shader_program;
-        FrameCounter fps_counter;
+        protected Shader shader_program;
+        protected FrameCounter fps_counter;
 
         public Game(int width, int height) : base(
             new GameWindowSettings(),
@@ -41,12 +41,40 @@ namespace Game {
             camera = new Camera(width, height, Vector3.Zero);
         }
 
+        protected void initObjects() {
+            game_objects = new List<GameObject>();
+
+            string diamond = "../../../Textures/diamond.jpg";
+            string stone = "../../../Textures/stone.jpg";
+
+
+            game_objects.Add(
+                new GameObject(
+                    new Texture(diamond),
+                    new Vector3(2.0f, 2.0f, 2.0f),
+                    1.0f
+                )
+            );
+
+            for (int i = -5; i <= 5; i++) {
+                for (int j = -5; j <= 5; j++) {
+                    game_objects.Add(
+                        new GameObject(
+                            new Texture(stone),
+                            new Vector3(i * 1.0f, 0.0f, j * 1.0f),
+                            1.0f
+                        )
+                    );
+                }
+            }
+        }
+
         protected override void OnLoad() {
             base.OnLoad();
 
             CursorState = CursorState.Grabbed;
 
-            cube = new GameObject(new Texture("../../../Textures/block.jpg"));
+            initObjects();
 
             shader_program.loadShader();
 
@@ -54,10 +82,12 @@ namespace Game {
         }
 
         protected override void OnUnload() {
+            
+            for (int i = 0; i < game_objects.Count;i++) {
+                game_objects[i].delete();
+            }
 
-            cube.delete();
-
-            shader_program.deleteShader();
+            shader_program.delete();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args) {
@@ -82,9 +112,11 @@ namespace Game {
             Matrix4 model = camera.GetModelMatrix(new Vector3(0f, 0f, -2f)); // Применяем трансляцию объекта
 
             // Передаем матрицы в шейдер
-            shader_program.SetTransformationMatrices(model, camera);
+            shader_program.setTransformationMatrices(model, camera);
 
-            cube.render();
+            for (int i = 0; i < game_objects.Count; i++) {
+                game_objects[i].render(shader_program);
+            }
 
             Context.SwapBuffers();
         }

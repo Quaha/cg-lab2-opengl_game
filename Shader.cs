@@ -1,15 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using OpenTK.Audio.OpenAL;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace Game {
     class Shader {
@@ -43,24 +33,24 @@ namespace Game {
         }
 
         // Проверка корректности линковки
-        private void checkProgramLink() {
+        public void checkProgramLink() {
             GL.GetProgram(shader_handle, GetProgramParameterName.LinkStatus, out int linkStatus);
             if (linkStatus == 0) {
                 string info = GL.GetProgramInfoLog(shader_handle);
                 Console.WriteLine($"Error linking program: {info}");
 
-                throw new Exception("Program linking failed");
+                throw new Exception("Program linking failed!");
             }
         }
 
         // Проверка корректности компиляции
-        private void checkShaderCompile(int shader) {
+        public void checkShaderCompile(int shader) {
             GL.GetShader(shader, ShaderParameter.CompileStatus, out int compileStatus);
             if (compileStatus == 0) {
                 string infoLog = GL.GetShaderInfoLog(shader);
                 Console.WriteLine($"Error compiling shader: {infoLog}");
 
-                throw new Exception("Shader compilation failed");
+                throw new Exception("Shader compilation failed!");
             }
         }
 
@@ -80,7 +70,7 @@ namespace Game {
             return shader_source;
         }
 
-        public void SetTransformationMatrices(Matrix4 model, Camera camera) {
+        public void setTransformationMatrices(Matrix4 model, Camera camera) {
             Matrix4 view = camera.GetViewMatrix();
             Matrix4 projection = camera.GetProjectionMatrix();
 
@@ -99,7 +89,7 @@ namespace Game {
         }
 
         // Удаление шейдерной программы
-        public void deleteShader() {
+        public void delete() {
             GL.DeleteProgram(shader_handle);
         }
     }

@@ -1,19 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using OpenTK.Audio.OpenAL;
-using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-
+﻿using OpenTK.Graphics.OpenGL4;
 using StbImageSharp;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Game {
     public class Texture {
@@ -25,7 +11,6 @@ namespace Game {
 
             // Привязка текстуры
             GL.ActiveTexture(TextureUnit.Texture0);
-
             Bind();
 
             // Параметры текстуры

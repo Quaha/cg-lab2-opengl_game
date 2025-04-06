@@ -28,11 +28,12 @@ namespace Game {
         private int SCREENWIDTH;
         private int SCREENHEIGHT;
 
-        public Camera() {
-        
-        }
+        bool can_fly;
+        float BASE_Y = 2.0f;
 
-        public Camera(int screen_width, int screen_height, Vector3 camera_position) {
+        public Camera(int screen_width, int screen_height, Vector3 camera_position, bool can_fly = true) {
+            this.can_fly = can_fly;
+
             SCREENWIDTH = screen_width;
             SCREENHEIGHT = screen_height;
             position = camera_position;
@@ -101,11 +102,15 @@ namespace Game {
             if (input.IsKeyDown(Keys.D)) {
                 position += right_direction * SPEED * (float)e.Time;
             }
-            if (input.IsKeyDown(Keys.LeftShift)) {
+            if (input.IsKeyDown(Keys.LeftShift) && can_fly) {
                 position -= up_direction * SPEED * (float)e.Time;
             }
-            if (input.IsKeyDown(Keys.Space)) {
+            if (input.IsKeyDown(Keys.Space) && can_fly) {
                 position += up_direction * SPEED * (float)e.Time;
+            }
+
+            if (!can_fly) {
+                position.Y = BASE_Y;
             }
 
             updateDirectionVectors();

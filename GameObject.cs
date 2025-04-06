@@ -16,7 +16,7 @@ using StbImageSharp;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Game {
-    public class GameObject {
+    class GameObject {
 
         private ArrayObject VAO;
         private BufferObject VBO;
@@ -26,40 +26,43 @@ namespace Game {
         private int vertex_count;
         private Texture texture;
 
-        public GameObject(Texture texture) { // Cube
+        private Vector3 position;
+
+        public GameObject(Texture texture, Vector3 position, float size) { // Cube
             this.texture = texture;
+            this.position = position;
 
             // Вершины куба
             Vector3[] vertices = new Vector3[] {
-                new Vector3(-0.5f,  0.5f,  0.5f),
-                new Vector3( 0.5f,  0.5f,  0.5f),
-                new Vector3( 0.5f, -0.5f,  0.5f),
-                new Vector3(-0.5f, -0.5f,  0.5f),
+                new Vector3(-size / 2,  size / 2,  size / 2),
+                new Vector3( size / 2,  size / 2,  size / 2),
+                new Vector3( size / 2, -size / 2,  size / 2),
+                new Vector3(-size / 2, -size / 2,  size / 2),
 
-                new Vector3( 0.5f,  0.5f,  0.5f),
-                new Vector3( 0.5f,  0.5f, -0.5f),
-                new Vector3( 0.5f, -0.5f, -0.5f),
-                new Vector3( 0.5f, -0.5f,  0.5f),
+                new Vector3( size / 2,  size / 2,  size / 2),
+                new Vector3( size / 2,  size / 2, -size / 2),
+                new Vector3( size / 2, -size / 2, -size / 2),
+                new Vector3( size / 2, -size / 2,  size / 2),
 
-                new Vector3( 0.5f,  0.5f, -0.5f),
-                new Vector3(-0.5f,  0.5f, -0.5f),
-                new Vector3(-0.5f, -0.5f, -0.5f),
-                new Vector3( 0.5f, -0.5f, -0.5f),
+                new Vector3( size / 2,  size / 2, -size / 2),
+                new Vector3(-size / 2,  size / 2, -size / 2),
+                new Vector3(-size / 2, -size / 2, -size / 2),
+                new Vector3( size / 2, -size / 2, -size / 2),
 
-                new Vector3(-0.5f,  0.5f, -0.5f),
-                new Vector3(-0.5f,  0.5f,  0.5f),
-                new Vector3(-0.5f, -0.5f,  0.5f),
-                new Vector3(-0.5f, -0.5f, -0.5f),
+                new Vector3(-size / 2,  size / 2, -size / 2),
+                new Vector3(-size / 2,  size / 2,  size / 2),
+                new Vector3(-size / 2, -size / 2,  size / 2),
+                new Vector3(-size / 2, -size / 2, -size / 2),
 
-                new Vector3(-0.5f,  0.5f, -0.5f),
-                new Vector3( 0.5f,  0.5f, -0.5f),
-                new Vector3( 0.5f,  0.5f,  0.5f),
-                new Vector3(-0.5f,  0.5f,  0.5f),
+                new Vector3(-size / 2,  size / 2, -size / 2),
+                new Vector3( size / 2,  size / 2, -size / 2),
+                new Vector3( size / 2,  size / 2,  size / 2),
+                new Vector3(-size / 2,  size / 2,  size / 2),
 
-                new Vector3(-0.5f, -0.5f, -0.5f),
-                new Vector3( 0.5f, -0.5f, -0.5f),
-                new Vector3( 0.5f, -0.5f,  0.5f),
-                new Vector3(-0.5f, -0.5f,  0.5f)
+                new Vector3(-size / 2, -size / 2, -size / 2),
+                new Vector3( size / 2, -size / 2, -size / 2),
+                new Vector3( size / 2, -size / 2,  size / 2),
+                new Vector3(-size / 2, -size / 2,  size / 2)
         };
 
             // Индексы
@@ -128,7 +131,23 @@ namespace Game {
             VAO.unBind();
         }
 
-        public void render() {
+        // Метод для сдвига объекта
+        public void setPosition(Vector3 newPosition) {
+            position = newPosition;
+        }
+
+        public Vector3 getPosition() { 
+            return position;
+        }
+
+        public void render(Shader shader) {
+            // Создаём матрицу трансляции
+            Matrix4 model = Matrix4.CreateTranslation(position);
+
+            // Передаем матрицу в шейдер
+            int modelLocation = GL.GetUniformLocation(shader.shader_handle, "model");
+            GL.UniformMatrix4(modelLocation, true, ref model);
+
             VAO.Bind();
 
             texture.Bind();
