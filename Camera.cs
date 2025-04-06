@@ -114,5 +114,20 @@ namespace Game {
         public void update(KeyboardState input, MouseState mouse, FrameEventArgs e) {
             inputProcessing(input, mouse, e);
         }
+
+        // Получение матрицы вида
+        public Matrix4 GetViewMatrix() {
+            return Matrix4.LookAt(position, position + front_direction, up_direction);
+        }
+
+        // Получение матрицы проекции
+        public Matrix4 GetProjectionMatrix() {
+            return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), (float)SCREENWIDTH / SCREENHEIGHT, 0.1f, 100f);
+        }
+
+        // Получение матрицы модели (трансляция)
+        public Matrix4 GetModelMatrix(Vector3 translation) {
+            return Matrix4.CreateTranslation(translation);
+        }
     }
 }

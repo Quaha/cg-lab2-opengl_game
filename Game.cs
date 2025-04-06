@@ -21,107 +21,11 @@ namespace Game {
         int width, height;
 
         Camera camera;
-       
-        ArrayObject VAO;
-        BufferObject VBO;
-        BufferObject EBO;
 
-        int texture_ID;
-        BufferObject texture_VBO;
+        GameObject cube;
 
         Shader shader_program;
         FrameCounter fps_counter;
-
-        List<Vector3> vertices = new List<Vector3>() {
-            new Vector3(-0.5f,  0.5f, 0.5f), //top-left-front vertice
-            new Vector3( 0.5f,  0.5f, 0.5f), //top-right-front vertice
-            new Vector3( 0.5f, -0.5f, 0.5f), //bottom-right-front vertice
-            new Vector3(-0.5f, -0.5f, 0.5f), //bottom-left-front vertice
-
-            new Vector3(0.5f, 0.5f, 0.5f), //top-left-back vertice
-            new Vector3(0.5f, 0.5f, -0.5f), //top-right-back vertice
-            new Vector3(0.5f, -0.5f,  -0.5f), //bottom-right-back vertice
-            new Vector3(0.5f, -0.5f,  0.5f), //bottom-left-back vertice
-
-            new Vector3(0.5f,  0.5f, -0.5f), //top-left-back vertice
-            new Vector3(-0.5f,  0.5f, -0.5f), //top-right-back vertice
-            new Vector3(-0.5f,  -0.5f, -0.5f), //bottom-right-back vertice
-            new Vector3(0.5f, -0.5f, -0.5f), //bottom-left-back vertice
-        
-            new Vector3(-0.5f, 0.5f, -0.5f), //top-right-back vertice
-            new Vector3(-0.5f, 0.5f, 0.5f), //top-left-back vertice
-            new Vector3(-0.5f, -0.5f,  0.5f), //bottom-left-back vertice
-            new Vector3(-0.5f, -0.5f,  -0.5f), //bottom-right-back vertice
-
-            new Vector3(-0.5f, 0.5f, -0.5f), //top-right-back vertice
-            new Vector3(0.5f, 0.5f, -0.5f), //top-left-back vertice
-            new Vector3(0.5f, 0.5f,  0.5f), //bottom-left-back vertice
-            new Vector3(-0.5f, 0.5f,  0.5f), //bottom-right-back vertice
-
-            new Vector3(-0.5f, -0.5f, -0.5f), //top-right-back vertice
-            new Vector3(0.5f, -0.5f, -0.5f), //top-left-back vertice
-            new Vector3(0.5f, -0.5f,  0.5f), //bottom-left-back vertice
-            new Vector3(-0.5f, -0.5f,  0.5f), //bottom-right-back vertice
-        };
-
-        uint[] indices = {
-            // front
-            0, 1, 2, // top triangle
-            2, 3, 0, // bottom triangle
-
-            // right
-            4, 5, 6,
-            6, 7, 4,
-
-            // back
-            8, 9, 10,
-            10, 11, 8,
-
-            // left
-            12, 13, 14,
-            14, 15, 12,
-
-            // up
-            16, 17, 18,
-            18, 19, 16,
-
-            // down
-            20, 21, 22,
-            22, 23, 20,
-
-        };
-
-        List<Vector2> texture_coords = new List<Vector2>() {
-            new Vector2(0f, 1f),
-            new Vector2(1f, 1f),
-            new Vector2(1f, 0f),
-            new Vector2(0f, 0f),
-
-            new Vector2(0f, 1f),
-            new Vector2(1f, 1f),
-            new Vector2(1f, 0f),
-            new Vector2(0f, 0f),
-
-            new Vector2(0f, 1f),
-            new Vector2(1f, 1f),
-            new Vector2(1f, 0f),
-            new Vector2(0f, 0f),
-
-            new Vector2(0f, 1f),
-            new Vector2(1f, 1f),
-            new Vector2(1f, 0f),
-            new Vector2(0f, 0f),
-
-            new Vector2(0f, 1f),
-            new Vector2(1f, 1f),
-            new Vector2(1f, 0f),
-            new Vector2(0f, 0f),
-
-            new Vector2(0f, 1f),
-            new Vector2(1f, 1f),
-            new Vector2(1f, 0f),
-            new Vector2(0f, 0f),
-        };
 
         public Game(int width, int height) : base(
             new GameWindowSettings(),
@@ -142,68 +46,7 @@ namespace Game {
 
             CursorState = CursorState.Grabbed;
 
-            // Создание и привязка VAO
-            VAO = new ArrayObject();
-
-            // Создание и настройка VBO для вершин
-            VBO = new BufferObject(BufferType.ArrayBuffer);
-            VBO.setData(vertices.ToArray(), BufferHint.StaticDraw);
-
-            VAO.setVertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-
-            // Создание и настройка EBO
-            EBO = new BufferObject(BufferType.ElementBuffer);
-            EBO.setData(indices, BufferHint.StaticDraw);
-
-            // Создание и настройка VBO для текстурных координат
-            texture_VBO = new BufferObject(BufferType.ArrayBuffer);
-            texture_VBO.setData(texture_coords.ToArray(), BufferHint.StaticDraw);
-
-            VAO.setVertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
-
-            // Загрузка текстуры
-            texture_ID = GL.GenTexture(); // Создание пустой текстуры
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, texture_ID);
-
-            // Параметры текстуры
-            GL.TexParameter(TextureTarget.Texture2D,
-                            TextureParameterName.TextureWrapS,
-                            (int)TextureWrapMode.Repeat);
-
-            GL.TexParameter(TextureTarget.Texture2D,
-                            TextureParameterName.TextureWrapT,
-                            (int)TextureWrapMode.Repeat);
-
-            GL.TexParameter(TextureTarget.Texture2D,
-                            TextureParameterName.TextureMinFilter,
-                            (int)TextureMinFilter.Nearest);
-
-            GL.TexParameter(TextureTarget.Texture2D,
-                            TextureParameterName.TextureMagFilter,
-                            (int)TextureMagFilter.Nearest);
-
-            // Загрузка изображения
-            StbImage.stbi_set_flip_vertically_on_load(1);
-            ImageResult boxTexture = ImageResult.FromStream(
-                File.OpenRead("../../../Textures/block.jpg"),
-                ColorComponents.RedGreenBlueAlpha
-            );
-
-            GL.TexImage2D(
-                TextureTarget.Texture2D,
-                0,
-                PixelInternalFormat.Rgba,
-                boxTexture.Width,
-                boxTexture.Height,
-                0,
-                PixelFormat.Rgba,
-                PixelType.UnsignedByte,
-                boxTexture.Data
-            );
-
-            // Отвязка текстуры
-            GL.BindTexture(TextureTarget.Texture2D, 0);
+            cube = new GameObject(new Texture("../../../Textures/block.jpg"));
 
             shader_program.loadShader();
 
@@ -212,14 +55,7 @@ namespace Game {
 
         protected override void OnUnload() {
 
-            VAO.delete();
-
-            VBO.delete();
-            EBO.delete();
-
-            GL.DeleteTexture(texture_ID);
-
-            texture_VBO.delete();
+            cube.delete();
 
             shader_program.deleteShader();
         }
@@ -242,25 +78,13 @@ namespace Game {
 
             shader_program.useShader();
 
-            GL.BindTexture(TextureTarget.Texture2D, texture_ID);
+            // Подготовка трансформации: только модель
+            Matrix4 model = camera.GetModelMatrix(new Vector3(0f, 0f, -2f)); // Применяем трансляцию объекта
 
-            // Трансформация
-            Matrix4 model = Matrix4.CreateRotationY(0);
-            Matrix4 translation = Matrix4.CreateTranslation(0f, 0f, -2f);
-            model *= translation;
+            // Передаем матрицы в шейдер
+            shader_program.SetTransformationMatrices(model, camera);
 
-            Matrix4 view = camera.getViewMatrix();
-            Matrix4 projection = camera.getProjection();
-
-            int modelLocation = GL.GetUniformLocation(shader_program.shader_handle, "model");
-            int viewLocation = GL.GetUniformLocation(shader_program.shader_handle, "view");
-            int projectionLocation = GL.GetUniformLocation(shader_program.shader_handle, "projection");
-
-            GL.UniformMatrix4(modelLocation, true, ref model);
-            GL.UniformMatrix4(viewLocation, true, ref view);
-            GL.UniformMatrix4(projectionLocation, true, ref projection);
-
-            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+            cube.render();
 
             Context.SwapBuffers();
         }

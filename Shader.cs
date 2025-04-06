@@ -80,6 +80,19 @@ namespace Game {
             return shader_source;
         }
 
+        public void SetTransformationMatrices(Matrix4 model, Camera camera) {
+            Matrix4 view = camera.GetViewMatrix();
+            Matrix4 projection = camera.GetProjectionMatrix();
+
+            int modelLocation = GL.GetUniformLocation(shader_handle, "model");
+            int viewLocation = GL.GetUniformLocation(shader_handle, "view");
+            int projectionLocation = GL.GetUniformLocation(shader_handle, "projection");
+
+            GL.UniformMatrix4(modelLocation, true, ref model);
+            GL.UniformMatrix4(viewLocation, true, ref view);
+            GL.UniformMatrix4(projectionLocation, true, ref projection);
+        }
+
         // Активация шейдерной программы
         public void useShader() {
             GL.UseProgram(shader_handle);
