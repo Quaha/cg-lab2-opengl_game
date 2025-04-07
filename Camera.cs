@@ -31,7 +31,7 @@ namespace Game {
         bool can_fly;
         float BASE_Y = 2.0f;
 
-        public Camera(int screen_width, int screen_height, Vector3 camera_position, bool can_fly = true) {
+        public Camera(int screen_width, int screen_height, Vector3 camera_position, bool can_fly = false) {
             this.can_fly = can_fly;
 
             SCREENWIDTH = screen_width;

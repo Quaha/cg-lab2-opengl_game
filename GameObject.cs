@@ -63,7 +63,7 @@ namespace Game {
                 new Vector3( size / 2, -size / 2, -size / 2),
                 new Vector3( size / 2, -size / 2,  size / 2),
                 new Vector3(-size / 2, -size / 2,  size / 2)
-        };
+            };
 
             // Индексы
             uint[] indices = {
@@ -130,6 +130,161 @@ namespace Game {
 
             VAO.unBind();
         }
+
+        public GameObject(Texture texture, 
+                          Vector3 position, 
+                          float dx, 
+                          float dy,
+                          float dz,
+                          bool stretching = true)
+        { // Parallelepiped
+            this.texture = texture;
+            this.position = position;
+
+            // Вершины параллелепипеда
+            Vector3[] vertices = new Vector3[] {
+                new Vector3(-dx / 2,  dy / 2,  dz / 2),
+                new Vector3( dx / 2,  dy / 2,  dz / 2),
+                new Vector3( dx / 2, -dy / 2,  dz / 2),
+                new Vector3(-dx / 2, -dy / 2,  dz / 2),
+
+                new Vector3( dx / 2,  dy / 2,  dz / 2),
+                new Vector3( dx / 2,  dy / 2, -dz / 2),
+                new Vector3( dx / 2, -dy / 2, -dz / 2),
+                new Vector3( dx / 2, -dy / 2,  dz / 2),
+
+                new Vector3( dx / 2,  dy / 2, -dz / 2),
+                new Vector3(-dx / 2,  dy / 2, -dz / 2),
+                new Vector3(-dx / 2, -dy / 2, -dz / 2),
+                new Vector3( dx / 2, -dy / 2, -dz / 2),
+
+                new Vector3(-dx / 2,  dy / 2, -dz / 2),
+                new Vector3(-dx / 2,  dy / 2,  dz / 2),
+                new Vector3(-dx / 2, -dy / 2,  dz / 2),
+                new Vector3(-dx / 2, -dy / 2, -dz / 2),
+
+                new Vector3(-dx / 2,  dy / 2, -dz / 2),
+                new Vector3( dx / 2,  dy / 2, -dz / 2),
+                new Vector3( dx / 2,  dy / 2,  dz / 2),
+                new Vector3(-dx / 2,  dy / 2,  dz / 2),
+
+                new Vector3(-dx / 2, -dy / 2, -dz / 2),
+                new Vector3( dx / 2, -dy / 2, -dz / 2),
+                new Vector3( dx / 2, -dy / 2,  dz / 2),
+                new Vector3(-dx / 2, -dy / 2,  dz / 2)
+            };
+
+            // Индексы
+            uint[] indices = {
+                0,  1,  2,  2,  3,  0,
+                4,  5,  6,  6,  7,  4,
+                8,  9, 10, 10, 11,  8,
+               12, 13, 14, 14, 15, 12,
+               16, 17, 18, 18, 19, 16,
+               20, 21, 22, 22, 23, 20,
+            };
+
+            // Текстурные координаты
+            List<Vector2> texture_coords;
+
+            if (stretching) {
+                texture_coords = new List<Vector2>() {
+                    new Vector2(0f, 1f),
+                    new Vector2(1f, 1f),
+                    new Vector2(1f, 0f),
+                    new Vector2(0f, 0f),
+
+                    new Vector2(0f, 1f),
+                    new Vector2(1f, 1f),
+                    new Vector2(1f, 0f),
+                    new Vector2(0f, 0f),
+
+                    new Vector2(0f, 1f),
+                    new Vector2(1f, 1f),
+                    new Vector2(1f, 0f),
+                    new Vector2(0f, 0f),
+
+                    new Vector2(0f, 1f),
+                    new Vector2(1f, 1f),
+                    new Vector2(1f, 0f),
+                    new Vector2(0f, 0f),
+
+                    new Vector2(0f, 1f),
+                    new Vector2(1f, 1f),
+                    new Vector2(1f, 0f),
+                    new Vector2(0f, 0f),
+
+                    new Vector2(0f, 1f),
+                    new Vector2(1f, 1f),
+                    new Vector2(1f, 0f),
+                    new Vector2(0f, 0f),
+                };
+            }
+            else {
+                texture_coords = new List<Vector2>() {
+                    // front (dx, dy)
+                    new Vector2(0f, dy),
+                    new Vector2(dx, dy),
+                    new Vector2(dx, 0f),
+                    new Vector2(0f, 0f),
+
+                    // right (dz, dy)
+                    new Vector2(0f, dy),
+                    new Vector2(dz, dy),
+                    new Vector2(dz, 0f),
+                    new Vector2(0f, 0f),
+
+                    // back (dx, dy)
+                    new Vector2(0f, dy),
+                    new Vector2(dx, dy),
+                    new Vector2(dx, 0f),
+                    new Vector2(0f, 0f),
+
+                    // left (dz, dy)
+                    new Vector2(0f, dy),
+                    new Vector2(dz, dy),
+                    new Vector2(dz, 0f),
+                    new Vector2(0f, 0f),
+
+                    // top (dx, dz)
+                    new Vector2(0f, dz),
+                    new Vector2(dx, dz),
+                    new Vector2(dx, 0f),
+                    new Vector2(0f, 0f),
+
+                    // bottom (dx, dz)
+                    new Vector2(0f, dz),
+                    new Vector2(dx, dz),
+                    new Vector2(dx, 0f),
+                    new Vector2(0f, 0f),
+                };
+
+            }
+
+            vertex_count = indices.Length;
+
+            // Буферы
+            VBO = new BufferObject(BufferType.ArrayBuffer);
+            texture_VBO = new BufferObject(BufferType.ArrayBuffer);
+            EBO = new BufferObject(BufferType.ElementBuffer);
+            VAO = new ArrayObject();
+
+            VAO.Bind();
+
+            VBO.setData(vertices, BufferHint.StaticDraw);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.EnableVertexAttribArray(0);
+
+            texture_VBO.setData(texture_coords.ToArray(), BufferHint.StaticDraw);
+            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
+            GL.EnableVertexAttribArray(1);
+
+            EBO.setData(indices, BufferHint.StaticDraw);
+
+            VAO.unBind();
+        }
+
+
 
         // Метод для сдвига объекта
         public void setPosition(Vector3 newPosition) {
