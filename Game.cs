@@ -58,14 +58,6 @@ namespace Game {
 
             game_objects.Add(
                 new GameObject(
-                    new Texture(diamond),
-                    new Vector3(2.0f, 2.0f, 2.0f),
-                    1.0f
-                )
-            );
-
-            game_objects.Add(
-                new GameObject(
                     new Texture(stone),
                     new Vector3(0.0f, 0.0f, 0.0f),
                     15.0f,
@@ -255,6 +247,10 @@ namespace Game {
 
             this.width = e.Width;
             this.height = e.Height;
+
+            if (camera != null) {
+                camera.UpdateProjection(width, height);
+            }
         }
     }
 }

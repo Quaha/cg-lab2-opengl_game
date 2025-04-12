@@ -134,5 +134,10 @@ namespace Game {
         public Matrix4 GetModelMatrix(Vector3 translation) {
             return Matrix4.CreateTranslation(translation);
         }
+
+        public void UpdateProjection(int width, int height) {
+            SCREENWIDTH = width;
+            SCREENHEIGHT = height;
+        }
     }
 }
