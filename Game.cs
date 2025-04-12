@@ -15,6 +15,11 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using StbImageSharp;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
+using Assimp;
+using Assimp.Configs;
+using Assimp.Unmanaged;
+
+
 namespace Game {
     class Game : GameWindow {
 
@@ -26,6 +31,10 @@ namespace Game {
 
         protected Shader shader_program;
         protected FrameCounter fps_counter;
+
+        static bool vaseLoaded = false;
+        static int vaseVAO, vaseVBO;
+        static int vaseVertexCount = 0;
 
         public Game(int width, int height) : base(
             new GameWindowSettings(),
@@ -56,6 +65,9 @@ namespace Game {
             string paint5 = "../../../Textures/painting5.jpg";
             string paint6 = "../../../Textures/painting6.jpg";
 
+            string obj_pott = "../../../Objects/pott.obj";
+            string text_pott = "../../../Objects/pott.mtl";
+
             game_objects.Add(
                 new GameObject(
                     new Texture(stone),
@@ -64,6 +76,15 @@ namespace Game {
                     0.1f,
                     15.0f,
                     false
+                )
+            );
+
+            game_objects.Add(
+                new GameObject(
+                    obj_pott,
+                    new Texture(diamond),
+                    new Vector3(0.0f, 0.0f, 0.0f),
+                    0.1f
                 )
             );
 
@@ -208,20 +229,24 @@ namespace Game {
             KeyboardState input = KeyboardState;
             base.OnUpdateFrame(args);
 
+            // Обновление камеры
             camera.update(input, mouse, args);
 
+            // Обновление FPS
             fps_counter.updateCounter((float)args.Time);
             if (fps_counter.canGetFPS()) {
                 Console.WriteLine($"FPS: {fps_counter.getFPS()}");
             }
 
+            // Очищаем экран
             GL.ClearColor(0.3f, 0.3f, 1f, 1f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
+            // Используем шейдер
             shader_program.useShader();
 
             // Подготовка трансформации: только модель
-            Matrix4 model = camera.GetModelMatrix(new Vector3(0f, 0f, -2f)); // Применяем трансляцию объекта
+            Matrix4 model = camera.GetModelMatrix(new Vector3(0f, 0f, -2f)) * Matrix4.CreateScale(0.1f); // Применяем трансляцию объекта
 
             // Передаем матрицы в шейдер
             shader_program.setTransformationMatrices(model, camera);
@@ -230,8 +255,10 @@ namespace Game {
                 game_objects[i].render(shader_program);
             }
 
+            // Меняем буферы
             Context.SwapBuffers();
         }
+
 
         protected override void OnUpdateFrame(FrameEventArgs args) {
             if (KeyboardState.IsKeyDown(Keys.Escape)) {

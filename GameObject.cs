@@ -15,6 +15,9 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 using StbImageSharp;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
+using Assimp;
+using Assimp.Configs;
+
 namespace Game {
     class GameObject {
 
@@ -285,6 +288,71 @@ namespace Game {
         }
 
 
+        public GameObject(string modelPath, Texture texture, Vector3 position, float size) {
+            this.position = position;
+            this.texture = texture;
+
+            // Загрузка модели из файла .obj
+            var importer = new AssimpContext();
+            Scene scene = importer.ImportFile(modelPath, PostProcessSteps.Triangulate | PostProcessSteps.GenerateNormals);
+
+            List<float> vertexData = new List<float>();
+            List<uint> indexData = new List<uint>(); // Для индексов
+
+            var mesh = scene.Meshes[0]; // Работаем с первым мешем
+            vertex_count = mesh.VertexCount;
+
+            float scaleFactor = size;  // Масштабирование модели
+            for (int i = 0; i < mesh.Vertices.Count; i++) {
+                var vertex = mesh.Vertices[i];
+                var normal = mesh.Normals[i];
+
+                // Масштабируем координаты вершин
+                vertex.X *= scaleFactor;
+                vertex.Y *= scaleFactor;
+                vertex.Z *= scaleFactor;
+
+                // Позиция (x, y, z), Нормали (nx, ny, nz)
+                vertexData.Add(vertex.X);
+                vertexData.Add(vertex.Y);
+                vertexData.Add(vertex.Z);
+                vertexData.Add(normal.X);
+                vertexData.Add(normal.Y);
+                vertexData.Add(normal.Z);
+            }
+
+            // Извлекаем индексы
+            foreach (var face in mesh.Faces) {
+                foreach (var index in face.Indices) {
+                    indexData.Add((uint)index); // Преобразуем индекс в uint
+                }
+            }
+
+            float[] vertexArray = vertexData.ToArray();
+            uint[] indices = indexData.ToArray();
+
+            // Создание VAO, VBO и EBO
+            VBO = new BufferObject(BufferType.ArrayBuffer);
+            texture_VBO = new BufferObject(BufferType.ArrayBuffer);
+            EBO = new BufferObject(BufferType.ElementBuffer);
+            VAO = new ArrayObject();
+
+            VAO.Bind();
+
+            // Загружаем данные вершин в VBO
+            VBO.setData(vertexArray, BufferHint.StaticDraw);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
+            GL.EnableVertexAttribArray(0);
+
+            // Загружаем нормали в VBO
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
+            GL.EnableVertexAttribArray(1);
+
+            // Загружаем индексы в EBO
+            EBO.setData(indices, BufferHint.StaticDraw);
+
+            VAO.unBind();
+        }
 
         // Метод для сдвига объекта
         public void setPosition(Vector3 newPosition) {
@@ -306,7 +374,7 @@ namespace Game {
             VAO.Bind();
 
             texture.Bind();
-            GL.DrawElements(PrimitiveType.Triangles, vertex_count, DrawElementsType.UnsignedInt, 0);
+            GL.DrawElements(OpenTK.Graphics.OpenGL4.PrimitiveType.Triangles, vertex_count, DrawElementsType.UnsignedInt, 0);
             texture.unBind();
 
             VAO.unBind();
