@@ -23,6 +23,7 @@ namespace Game {
 
         private ArrayObject VAO;
         private BufferObject VBO;
+        BufferObject normals_VBO;
         private BufferObject texture_VBO;
         private BufferObject EBO;
 
@@ -31,12 +32,17 @@ namespace Game {
 
         private Vector3 position;
 
+        Vector3[] vertices;
+        Vector3[] normals;
+        uint[] indices;
+        List<Vector2> texture_coords;
+
         public GameObject(Texture texture, Vector3 position, float size) { // Cube
             this.texture = texture;
             this.position = position;
 
             // Вершины куба
-            Vector3[] vertices = new Vector3[] {
+            vertices = new Vector3[] {
                 new Vector3(-size / 2,  size / 2,  size / 2),
                 new Vector3( size / 2,  size / 2,  size / 2),
                 new Vector3( size / 2, -size / 2,  size / 2),
@@ -69,7 +75,7 @@ namespace Game {
             };
 
             // Индексы
-            uint[] indices = {
+            indices = new uint[]{
                 0,  1,  2,  2,  3,  0,
                 4,  5,  6,  6,  7,  4,
                 8,  9, 10, 10, 11,  8,
@@ -79,7 +85,7 @@ namespace Game {
             };
 
             // Текстурные координаты
-            List<Vector2> texture_coords = new List<Vector2>() {
+            texture_coords = new List<Vector2>() {
                 new Vector2(0f, 1f),
                 new Vector2(1f, 1f),
                 new Vector2(1f, 0f),
@@ -145,7 +151,7 @@ namespace Game {
             this.position = position;
 
             // Вершины параллелепипеда
-            Vector3[] vertices = new Vector3[] {
+            vertices = new Vector3[] {
                 new Vector3(-dx / 2,  dy / 2,  dz / 2),
                 new Vector3( dx / 2,  dy / 2,  dz / 2),
                 new Vector3( dx / 2, -dy / 2,  dz / 2),
@@ -177,8 +183,23 @@ namespace Game {
                 new Vector3(-dx / 2, -dy / 2,  dz / 2)
             };
 
+            normals = new Vector3[] {
+                // front
+                Vector3.UnitZ, Vector3.UnitZ, Vector3.UnitZ, Vector3.UnitZ,
+                // right
+                Vector3.UnitX, Vector3.UnitX, Vector3.UnitX, Vector3.UnitX,
+                // back
+                -Vector3.UnitZ, -Vector3.UnitZ, -Vector3.UnitZ, -Vector3.UnitZ,
+                // left
+                -Vector3.UnitX, -Vector3.UnitX, -Vector3.UnitX, -Vector3.UnitX,
+                // top
+                Vector3.UnitY, Vector3.UnitY, Vector3.UnitY, Vector3.UnitY,
+                // bottom
+                -Vector3.UnitY, -Vector3.UnitY, -Vector3.UnitY, -Vector3.UnitY
+            };
+
             // Индексы
-            uint[] indices = {
+            indices = new uint[] {
                 0,  1,  2,  2,  3,  0,
                 4,  5,  6,  6,  7,  4,
                 8,  9, 10, 10, 11,  8,
@@ -186,9 +207,6 @@ namespace Game {
                16, 17, 18, 18, 19, 16,
                20, 21, 22, 22, 23, 20,
             };
-
-            // Текстурные координаты
-            List<Vector2> texture_coords;
 
             if (stretching) {
                 texture_coords = new List<Vector2>() {
@@ -268,6 +286,7 @@ namespace Game {
 
             // Буферы
             VBO = new BufferObject(BufferType.ArrayBuffer);
+            normals_VBO = new BufferObject(BufferType.ArrayBuffer);
             texture_VBO = new BufferObject(BufferType.ArrayBuffer);
             EBO = new BufferObject(BufferType.ElementBuffer);
             VAO = new ArrayObject();
@@ -281,6 +300,10 @@ namespace Game {
             texture_VBO.setData(texture_coords.ToArray(), BufferHint.StaticDraw);
             GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
             GL.EnableVertexAttribArray(1);
+
+            normals_VBO.setData(normals, BufferHint.StaticDraw);
+            GL.VertexAttribPointer(2, 3, VertexAttribPointerType.Float, false, 0, 0);
+            GL.EnableVertexAttribArray(2);
 
             EBO.setData(indices, BufferHint.StaticDraw);
 
@@ -335,7 +358,7 @@ namespace Game {
             vertex_count = indexData.Count; // теперь считаем общее число индексов
 
             float[] vertexArray = vertexData.ToArray();
-            uint[] indices = indexData.ToArray();
+            indices = indexData.ToArray();
 
             // Создание VAO, VBO и EBO
             VBO = new BufferObject(BufferType.ArrayBuffer);

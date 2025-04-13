@@ -77,43 +77,43 @@ namespace Game {
             );
 
             // vases
-            {
-                game_objects.Add(
-                    new GameObject(
-                        vase_obj,
-                        new Texture(vase),
-                        new Vector3(6.5f, 0.0f, 6.5f),
-                        0.01f
-                    )
-                );
+            //{
+            //    game_objects.Add(
+            //        new GameObject(
+            //            vase_obj,
+            //            new Texture(vase),
+            //            new Vector3(6.5f, 0.0f, 6.5f),
+            //            0.01f
+            //        )
+            //    );
 
-                game_objects.Add(
-                    new GameObject(
-                        vase_obj,
-                        new Texture(vase),
-                        new Vector3(-6.5f, 0.0f, 6.5f),
-                        0.01f
-                    )
-                );
+            //    game_objects.Add(
+            //        new GameObject(
+            //            vase_obj,
+            //            new Texture(vase),
+            //            new Vector3(-6.5f, 0.0f, 6.5f),
+            //            0.01f
+            //        )
+            //    );
 
-                game_objects.Add(
-                    new GameObject(
-                        vase_obj,
-                        new Texture(vase),
-                        new Vector3(6.5f, 0.0f, -6.5f),
-                        0.01f
-                    )
-                );
+            //    game_objects.Add(
+            //        new GameObject(
+            //            vase_obj,
+            //            new Texture(vase),
+            //            new Vector3(6.5f, 0.0f, -6.5f),
+            //            0.01f
+            //        )
+            //    );
 
-                game_objects.Add(
-                    new GameObject(
-                        vase_obj,
-                        new Texture(vase),
-                        new Vector3(-6.5f, 0.0f, -6.5f),
-                        0.01f
-                    )
-                );
-            }
+            //    game_objects.Add(
+            //        new GameObject(
+            //            vase_obj,
+            //            new Texture(vase),
+            //            new Vector3(-6.5f, 0.0f, -6.5f),
+            //            0.01f
+            //        )
+            //    );
+            //}
 
             // walls
             {
@@ -331,8 +331,10 @@ namespace Game {
             // Подготовка трансформации: только модель
             Matrix4 model = camera.GetModelMatrix(new Vector3(0f, 0f, -2f)) * Matrix4.CreateScale(0.1f); // Применяем трансляцию объекта
 
+            Light light = new Light(new Vector3(0.0f, 5.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
+
             // Передаем матрицы в шейдер
-            shader_program.setTransformationMatrices(model, camera);
+            shader_program.setTransformationMatrices(model, camera, light);
 
             for (int i = 0; i < game_objects.Count; i++) {
                 game_objects[i].render(shader_program);

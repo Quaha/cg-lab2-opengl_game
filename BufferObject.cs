@@ -35,6 +35,7 @@ namespace Game {
                 data,
                 (BufferUsageHint)hint
             );
+
         }
 
         public void Bind() {

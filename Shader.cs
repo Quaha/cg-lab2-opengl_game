@@ -70,7 +70,7 @@ namespace Game {
             return shader_source;
         }
 
-        public void setTransformationMatrices(Matrix4 model, Camera camera) {
+        public void setTransformationMatrices(Matrix4 model, Camera camera, Light light) {
             Matrix4 view = camera.GetViewMatrix();
             Matrix4 projection = camera.GetProjectionMatrix();
 
@@ -78,9 +78,22 @@ namespace Game {
             int viewLocation = GL.GetUniformLocation(shader_handle, "view");
             int projectionLocation = GL.GetUniformLocation(shader_handle, "projection");
 
+            int lightPositionLocation = GL.GetUniformLocation(shader_handle, "lightPosition");
+            int lightColourLocation = GL.GetUniformLocation(shader_handle, "lightColour");
+
+            if (lightPositionLocation == -1 || lightColourLocation == -1) {
+                Console.WriteLine("Error: uniform variable not found in the shader");
+            }
+
+            Console.WriteLine("Light Position: " + light.getPosition());
+            Console.WriteLine("Light Colour: " + light.getColour());
+
             GL.UniformMatrix4(modelLocation, true, ref model);
             GL.UniformMatrix4(viewLocation, true, ref view);
             GL.UniformMatrix4(projectionLocation, true, ref projection);
+
+            GL.Uniform3(lightPositionLocation, light.getPosition());
+            GL.Uniform3(lightColourLocation, light.getColour());
         }
 
         // Активация шейдерной программы
