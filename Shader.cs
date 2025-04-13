@@ -1,11 +1,10 @@
-﻿using Assimp;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace Game {
     class Shader {
 
-        public int shader_handle;
+        int shader_handle;
 
         // Загрузка, компиляция и линковка шейдеров программы
         public void loadShader() {
@@ -35,8 +34,8 @@ namespace Game {
 
         // Проверка корректности линковки
         public void checkProgramLink() {
-            GL.GetProgram(shader_handle, GetProgramParameterName.LinkStatus, out int linkStatus);
-            if (linkStatus == 0) {
+            GL.GetProgram(shader_handle, GetProgramParameterName.LinkStatus, out int link_status);
+            if (link_status == 0) {
                 string info = GL.GetProgramInfoLog(shader_handle);
                 Console.WriteLine($"Error linking program: {info}");
 
@@ -46,10 +45,10 @@ namespace Game {
 
         // Проверка корректности компиляции
         public void checkShaderCompile(int shader) {
-            GL.GetShader(shader, ShaderParameter.CompileStatus, out int compileStatus);
-            if (compileStatus == 0) {
-                string infoLog = GL.GetShaderInfoLog(shader);
-                Console.WriteLine($"Error compiling shader: {infoLog}");
+            GL.GetShader(shader, ShaderParameter.CompileStatus, out int compile_status);
+            if (compile_status == 0) {
+                string info = GL.GetShaderInfoLog(shader);
+                Console.WriteLine($"Error compiling shader: {info}");
 
                 throw new Exception("Shader compilation failed!");
             }
@@ -71,9 +70,8 @@ namespace Game {
             return shader_source;
         }
 
-        public void setTransformationMatrices(Matrix4 model, Camera camera, List<Light> lights) {
-            // Матрицы
-
+        // Передача информации в шейдеры
+        public void setShaderData(Matrix4 model, Camera camera, List<Light> lights) {
             Matrix4 view = camera.GetViewMatrix();
             Matrix4 projection = camera.GetProjectionMatrix();
 
@@ -85,14 +83,14 @@ namespace Game {
             GL.UniformMatrix4(viewLocation, true, ref view);
             GL.UniformMatrix4(projectionLocation, true, ref projection);
 
-            // Источники света (ограничение до 8)
+            // Источники света (ограничение до 8, можно повысить в коде шейдеров)
             int count = Math.Min(lights.Count, 8);
-            GL.Uniform1(GL.GetUniformLocation(shader_handle, "lightCount"), count);
+            GL.Uniform1(GL.GetUniformLocation(shader_handle, "light_count"), count);
 
             for (int i = 0; i < count; i++) {
-                string posName = $"lightPositions[{i}]";
-                string colName = $"lightColors[{i}]";
-                string powName = $"lightPower[{i}]";
+                string posName = $"light_positions[{i}]";
+                string colName = $"light_colors[{i}]";
+                string powName = $"light_power[{i}]";
 
                 GL.Uniform3(GL.GetUniformLocation(shader_handle, posName), lights[i].getPosition());
                 GL.Uniform3(GL.GetUniformLocation(shader_handle, colName), lights[i].getColour());
@@ -100,14 +98,16 @@ namespace Game {
             }
         }
 
-        // Активация шейдерной программы
         public void useShader() {
             GL.UseProgram(shader_handle);
         }
 
-        // Удаление шейдерной программы
         public void delete() {
             GL.DeleteProgram(shader_handle);
+        }
+
+        public int getHandle() {
+            return shader_handle;
         }
     }
 }

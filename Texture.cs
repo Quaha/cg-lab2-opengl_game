@@ -4,7 +4,7 @@ using StbImageSharp;
 namespace Game {
     public class Texture {
 
-        public int texture_ID;
+        int texture_ID;
 
         public Texture(string path) {
             texture_ID = GL.GenTexture();

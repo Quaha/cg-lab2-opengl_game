@@ -1,23 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using OpenTK.Audio.OpenAL;
+﻿using OpenTK.Audio.OpenAL;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
-
-using StbImageSharp;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-using Assimp;
-using Assimp.Configs;
-using Assimp.Unmanaged;
 
 
 namespace Game {
@@ -341,24 +327,20 @@ namespace Game {
                 Console.WriteLine($"FPS: {fps_counter.getFPS()}");
             }
 
-            // Очищаем экран
             GL.ClearColor(0.3f, 0.3f, 1f, 1f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            // Используем шейдер
             shader_program.useShader();
 
-            // Подготовка трансформации: только модель
-            Matrix4 model = camera.GetModelMatrix(new Vector3(0f, 0f, -2f)) * Matrix4.CreateScale(0.1f); // Применяем трансляцию объекта
+            Matrix4 model = camera.GetModelMatrix(new Vector3(0f, 0f, -2f)) * Matrix4.CreateScale(0.1f);
 
-            // Передаем матрицы в шейдер
-            shader_program.setTransformationMatrices(model, camera, lights);
+            // Передача матрицы в шейдер
+            shader_program.setShaderData(model, camera, lights);
 
             for (int i = 0; i < game_objects.Count; i++) {
                 game_objects[i].render(shader_program);
             }
 
-            // Меняем буферы
             Context.SwapBuffers();
         }
 

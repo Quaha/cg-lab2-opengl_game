@@ -11,22 +11,22 @@ using System.Threading.Tasks;
 namespace Game {
     class Camera {
 
-        public Vector3 position;
+        Vector3 position;
 
-        private Vector3 up_direction = Vector3.UnitY;
-        private Vector3 front_direction = -Vector3.UnitZ;
-        private Vector3 right_direction = Vector3.UnitX;
+        Vector3 up_direction = Vector3.UnitY;
+        Vector3 front_direction = -Vector3.UnitZ;
+        Vector3 right_direction = Vector3.UnitX;
 
-        private float SPEED = 10f;
-        private float SENSITIVITY = 120f;
+        float SPEED = 10f;
+        float SENSITIVITY = 120f;
 
-        private float pitch = 0.0f; // degrees
-        private float yaw = 0.0f; // degrees
+        float pitch = 0.0f; // degrees
+        float yaw = 0.0f; // degrees
 
-        private Vector2 last_mouse_position;
+        Vector2 last_mouse_position;
 
-        private int SCREENWIDTH;
-        private int SCREENHEIGHT;
+        int SCREENWIDTH;
+        int SCREENHEIGHT;
 
         bool can_fly;
         float BASE_Y = 2.0f;
@@ -120,17 +120,17 @@ namespace Game {
             inputProcessing(input, mouse, e);
         }
 
-        // Получение матрицы вида
+        // Получение матрицы вида (переводит все координаты в координаты камеры)
         public Matrix4 GetViewMatrix() {
             return Matrix4.LookAt(position, position + front_direction, up_direction);
         }
 
-        // Получение матрицы проекции
+        // Получение матрицы проекции (отвечает за перспективу)
         public Matrix4 GetProjectionMatrix() {
             return Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(45f), (float)SCREENWIDTH / SCREENHEIGHT, 0.1f, 100f);
         }
 
-        // Получение матрицы модели (трансляция)
+        // Получение матрицы модели (перемещение)
         public Matrix4 GetModelMatrix(Vector3 translation) {
             return Matrix4.CreateTranslation(translation);
         }

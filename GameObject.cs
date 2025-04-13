@@ -1,36 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using OpenTK.Audio.OpenAL;
-using OpenTK.Graphics.OpenGL4;
+﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using OpenTK.Windowing.Common;
-using OpenTK.Windowing.Desktop;
-using OpenTK.Windowing.GraphicsLibraryFramework;
-
-using StbImageSharp;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 using Assimp;
-using Assimp.Configs;
 
 namespace Game {
     class GameObject {
 
-        private ArrayObject VAO;
-        private BufferObject VBO;
+        ArrayObject VAO;
+        BufferObject VBO;
         BufferObject normals_VBO;
-        private BufferObject texture_VBO;
-        private BufferObject EBO;
+        BufferObject texture_VBO;
+        BufferObject EBO;
 
-        private int vertex_count;
-        private Texture texture;
+        int vertex_count;
+        Texture texture;
 
-        private Vector3 position;
+        Vector3 position;
 
         Vector3[] vertices;
         Vector3[] normals;
@@ -43,7 +28,7 @@ namespace Game {
                           float dy,
                           float dz,
                           bool stretching = true)
-        { // Parallelepiped
+        { // Параллелепипед
             this.texture = texture;
             this.position = position;
 
@@ -140,37 +125,31 @@ namespace Game {
             }
             else {
                 texture_coords = new List<Vector2>() {
-                    // front (dx, dy)
                     new Vector2(0f, dy),
                     new Vector2(dx, dy),
                     new Vector2(dx, 0f),
                     new Vector2(0f, 0f),
 
-                    // right (dz, dy)
                     new Vector2(0f, dy),
                     new Vector2(dz, dy),
                     new Vector2(dz, 0f),
                     new Vector2(0f, 0f),
 
-                    // back (dx, dy)
                     new Vector2(0f, dy),
                     new Vector2(dx, dy),
                     new Vector2(dx, 0f),
                     new Vector2(0f, 0f),
 
-                    // left (dz, dy)
                     new Vector2(0f, dy),
                     new Vector2(dz, dy),
                     new Vector2(dz, 0f),
                     new Vector2(0f, 0f),
 
-                    // top (dx, dz)
                     new Vector2(0f, dz),
                     new Vector2(dx, dz),
                     new Vector2(dx, 0f),
                     new Vector2(0f, 0f),
 
-                    // bottom (dx, dz)
                     new Vector2(0f, dz),
                     new Vector2(dx, dz),
                     new Vector2(dx, 0f),
@@ -183,8 +162,8 @@ namespace Game {
 
             // Буферы
             VBO = new BufferObject(BufferType.ArrayBuffer);
-            normals_VBO = new BufferObject(BufferType.ArrayBuffer);
             texture_VBO = new BufferObject(BufferType.ArrayBuffer);
+            normals_VBO = new BufferObject(BufferType.ArrayBuffer);
             EBO = new BufferObject(BufferType.ElementBuffer);
             VAO = new ArrayObject();
 
@@ -208,77 +187,77 @@ namespace Game {
         }
 
 
-        public GameObject(string modelPath, Texture texture, Vector3 position, float size) {
+        public GameObject(string model_path, Texture texture, Vector3 position, float size) {
             this.position = position;
             this.texture = texture;
 
             var importer = new AssimpContext();
-            Scene scene = importer.ImportFile(modelPath,
+            Scene scene = importer.ImportFile(
+                model_path,
                 PostProcessSteps.Triangulate |
-                PostProcessSteps.GenerateSmoothNormals |
-                PostProcessSteps.FlipUVs); // FlipUVs — на случай, если текстура инвертирована
+                PostProcessSteps.GenerateSmoothNormals
+            );
 
-            List<float> vertexData = new List<float>();
-            List<uint> indexData = new List<uint>();
-            List<Vector3> vertexList = new List<Vector3>();
-            List<Vector3> normalList = new List<Vector3>();
+            List<float> vertex_data = new List<float>();
+            List<uint> index_data = new List<uint>();
+            List<Vector3> vertex_list = new List<Vector3>();
+            List<Vector3> normal_list = new List<Vector3>();
+
             texture_coords = new List<Vector2>();
-            uint indexOffset = 0;
+
+            uint index_offset = 0;
 
             float scaleFactor = size;
 
             foreach (var mesh in scene.Meshes) {
                 for (int i = 0; i < mesh.Vertices.Count; i++) {
                     var vertex = mesh.Vertices[i];
-                    var normal = mesh.HasNormals ? mesh.Normals[i] : new Assimp.Vector3D(0, 1, 0); // fallback
+                    var normal = mesh.HasNormals ? mesh.Normals[i] : new Assimp.Vector3D(0, 1, 0);
 
-                    // Масштабируем координаты
+                    // Масштабирование координат
                     vertex.X *= scaleFactor;
                     vertex.Y *= scaleFactor;
                     vertex.Z *= scaleFactor;
 
-                    // Сохраняем вершину и нормаль для поля
                     var v = new Vector3(vertex.X, vertex.Y, vertex.Z);
                     var n = new Vector3(normal.X, normal.Y, normal.Z);
-                    vertexList.Add(v);
-                    normalList.Add(n);
+                    vertex_list.Add(v);
+                    normal_list.Add(n);
 
-                    // Добавляем в общий массив для OpenGL
-                    vertexData.Add(v.X);
-                    vertexData.Add(v.Y);
-                    vertexData.Add(v.Z);
-                    vertexData.Add(n.X);
-                    vertexData.Add(n.Y);
-                    vertexData.Add(n.Z);
 
-                    // Текстурные координаты (если есть)
+                    vertex_data.Add(v.X);
+                    vertex_data.Add(v.Y);
+                    vertex_data.Add(v.Z);
+                    vertex_data.Add(n.X);
+                    vertex_data.Add(n.Y);
+                    vertex_data.Add(n.Z);
+
+                    // Текстурные координаты
                     if (mesh.HasTextureCoords(0)) {
                         var uv = mesh.TextureCoordinateChannels[0][i];
                         texture_coords.Add(new Vector2(uv.X, uv.Y));
                     }
                     else {
-                        texture_coords.Add(Vector2.Zero); // placeholder
+                        texture_coords.Add(Vector2.Zero);
                     }
                 }
 
                 foreach (var face in mesh.Faces) {
                     foreach (var index in face.Indices) {
-                        indexData.Add(indexOffset + (uint)index);
+                        index_data.Add(index_offset + (uint)index);
                     }
                 }
 
-                indexOffset += (uint)mesh.Vertices.Count;
+                index_offset += (uint)mesh.Vertices.Count;
             }
 
-            // Сохраняем поля
-            vertices = vertexList.ToArray();
-            normals = normalList.ToArray();
-            indices = indexData.ToArray();
+            vertices = vertex_list.ToArray();
+            normals = normal_list.ToArray();
+            indices = index_data.ToArray();
             vertex_count = indices.Length;
 
-            float[] vertexArray = vertexData.ToArray();
+            float[] vertexArray = vertex_data.ToArray();
 
-            // Создание буферов
             VBO = new BufferObject(BufferType.ArrayBuffer);
             normals_VBO = new BufferObject(BufferType.ArrayBuffer);
             texture_VBO = new BufferObject(BufferType.ArrayBuffer);
@@ -287,14 +266,12 @@ namespace Game {
 
             VAO.Bind();
 
-            // Загружаем позицию и нормали (в одном VBO, 6 float на вершину)
             VBO.setData(vertexArray, BufferHint.StaticDraw);
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 0);
             GL.EnableVertexAttribArray(0);
             GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, 6 * sizeof(float), 3 * sizeof(float));
             GL.EnableVertexAttribArray(1);
 
-            // Загружаем текстурные координаты
             if (texture_coords.Count > 0) {
                 float[] texCoordsArray = texture_coords
                     .SelectMany(tc => new float[] { tc.X, tc.Y })
@@ -305,13 +282,11 @@ namespace Game {
                 GL.EnableVertexAttribArray(2);
             }
 
-            // Загружаем индексы
             EBO.setData(indices, BufferHint.StaticDraw);
 
             VAO.unBind();
         }
 
-        // Метод для сдвига объекта
         public void setPosition(Vector3 newPosition) {
             position = newPosition;
         }
@@ -321,12 +296,11 @@ namespace Game {
         }
 
         public void render(Shader shader) {
-            // Создаём матрицу трансляции
+            // Создание матрицы трансляции
             Matrix4 model = Matrix4.CreateTranslation(position);
 
-            // Передаем матрицу в шейдер
-            int modelLocation = GL.GetUniformLocation(shader.shader_handle, "model");
-            GL.UniformMatrix4(modelLocation, true, ref model);
+            int model_location = GL.GetUniformLocation(shader.getHandle(), "model");
+            GL.UniformMatrix4(model_location, true, ref model);
 
             VAO.Bind();
 
@@ -340,9 +314,10 @@ namespace Game {
         public void delete() {
             VAO.delete();
             VBO.delete();
+            texture_VBO.delete();
+            normals_VBO.delete();
             EBO.delete();
 
-            texture_VBO.delete();
             texture.delete();
         }
     }

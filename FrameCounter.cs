@@ -7,12 +7,8 @@ using System.Threading.Tasks;
 namespace Game {
     class FrameCounter {
 
-        private int frame_сount = 0;
-        private float time_elapsed = 0f;
-
-        public FrameCounter() {
-
-        }
+        int frame_сount = 0;
+        float time_elapsed = 0f;
 
         public void updateCounter(float time) {
             time_elapsed += time;

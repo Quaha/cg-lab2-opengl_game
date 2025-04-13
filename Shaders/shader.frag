@@ -1,37 +1,36 @@
 #version 460 core
 
-in vec2 texCoord;
+in vec2 texture_coord;
 in vec3 normal;
-in vec3 fragPos;
+in vec3 frag_pos;
 
-out vec4 fragColor;
+out vec4 frag_color;
 
 uniform sampler2D texture0;
 
-uniform vec3 lightPositions[8];
-uniform vec3 lightColors[8];
-uniform float lightPower[8];
-uniform int lightCount;
+uniform vec3 light_positions[8];
+uniform vec3 light_colors[8];
+uniform float light_power[8];
+uniform int light_count;
 
 void main() {
-    vec3 unitNormal = normalize(normal);
-    vec3 totalDiffuse = vec3(0.0);
+    vec3 unit_normal = normalize(normal);
+    vec3 total_diffuse = vec3(0.0);
     
-    float constant = 0.5;
-    float linear = 0.02;
-    float quadratic = 0.12;
+    float a = 0.12;
+    float b = 0.02;
+    float c = 0.5;
 
-    for(int i = 0; i < lightCount; i++) {
-        vec3 lightDir = lightPositions[i] - fragPos;
-        float distance = length(lightDir);
-        lightDir = normalize(lightDir);
+    for(int i = 0; i < light_count; i++) {
+        vec3 light_dir = light_positions[i] - frag_pos;
+        float distance = length(light_dir);
+        light_dir = normalize(light_dir);
 
-        float attenuation = 1.0 / (constant + linear * distance + quadratic * (distance * distance));
+        float attenuation = 1.0 / (a * distance * distance + b * distance + c);
 
-        float brightness = max(dot(unitNormal, lightDir), 0.0);
-        totalDiffuse += brightness * lightColors[i] * lightPower[i] * attenuation;
+        float brightness = max(dot(unit_normal, light_dir), 0.0);
+        total_diffuse += brightness * light_colors[i] * light_power[i] * attenuation;
     }
     
-    fragColor = vec4(totalDiffuse, 1.0) * texture(texture0, texCoord);
-
+    frag_color = vec4(total_diffuse, 1.0) * texture(texture0, texture_coord);
 }
