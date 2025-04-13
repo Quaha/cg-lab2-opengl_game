@@ -76,44 +76,44 @@ namespace Game {
                 )
             );
 
-            // vases
-            //{
-            //    game_objects.Add(
-            //        new GameObject(
-            //            vase_obj,
-            //            new Texture(vase),
-            //            new Vector3(6.5f, 0.0f, 6.5f),
-            //            0.01f
-            //        )
-            //    );
+            //vases
+            {
+                game_objects.Add(
+                    new GameObject(
+                        vase_obj,
+                        new Texture(vase),
+                        new Vector3(6.5f, 0.0f, 6.5f),
+                        0.01f
+                    )
+                );
 
-            //    game_objects.Add(
-            //        new GameObject(
-            //            vase_obj,
-            //            new Texture(vase),
-            //            new Vector3(-6.5f, 0.0f, 6.5f),
-            //            0.01f
-            //        )
-            //    );
+                game_objects.Add(
+                    new GameObject(
+                        vase_obj,
+                        new Texture(vase),
+                        new Vector3(-6.5f, 0.0f, 6.5f),
+                        0.01f
+                    )
+                );
 
-            //    game_objects.Add(
-            //        new GameObject(
-            //            vase_obj,
-            //            new Texture(vase),
-            //            new Vector3(6.5f, 0.0f, -6.5f),
-            //            0.01f
-            //        )
-            //    );
+                game_objects.Add(
+                    new GameObject(
+                        vase_obj,
+                        new Texture(vase),
+                        new Vector3(6.5f, 0.0f, -6.5f),
+                        0.01f
+                    )
+                );
 
-            //    game_objects.Add(
-            //        new GameObject(
-            //            vase_obj,
-            //            new Texture(vase),
-            //            new Vector3(-6.5f, 0.0f, -6.5f),
-            //            0.01f
-            //        )
-            //    );
-            //}
+                game_objects.Add(
+                    new GameObject(
+                        vase_obj,
+                        new Texture(vase),
+                        new Vector3(-6.5f, 0.0f, -6.5f),
+                        0.01f
+                    )
+                );
+            }
 
             // walls
             {

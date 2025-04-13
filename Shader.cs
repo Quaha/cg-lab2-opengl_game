@@ -81,12 +81,6 @@ namespace Game {
             int lightPositionLocation = GL.GetUniformLocation(shader_handle, "lightPosition");
             int lightColourLocation = GL.GetUniformLocation(shader_handle, "lightColour");
 
-            if (lightPositionLocation == -1 || lightColourLocation == -1) {
-                Console.WriteLine("Error: uniform variable not found in the shader");
-            }
-
-            Console.WriteLine("Light Position: " + light.getPosition());
-            Console.WriteLine("Light Colour: " + light.getColour());
 
             GL.UniformMatrix4(modelLocation, true, ref model);
             GL.UniformMatrix4(viewLocation, true, ref view);
