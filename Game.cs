@@ -28,6 +28,7 @@ namespace Game {
         protected Camera camera;
 
         protected List<GameObject> game_objects;
+        List<Light> lights = new List<Light>();
 
         protected Shader shader_program;
         protected FrameCounter fps_counter;
@@ -170,6 +171,9 @@ namespace Game {
                     )
                 );
 
+                Light light1 = new Light(new Vector3(-5.5f, 4.5f, 0), new Vector3(1.0f, 1.0f, 1.0f), 1.2f);
+                lights.Add(light1);
+
                 game_objects.Add(
                     new GameObject(
                         new Texture(frame),
@@ -189,6 +193,9 @@ namespace Game {
                         5.0f
                     )
                 );
+
+                Light light2 = new Light(new Vector3(5.5f, 4.5f, 0), new Vector3(1.0f, 1.0f, 1.0f), 1.2f);
+                lights.Add(light2);
 
                 game_objects.Add(
                     new GameObject(
@@ -212,6 +219,10 @@ namespace Game {
                     )
                 );
 
+                Light light3 = new Light(new Vector3(-4.0f, 4.5f, 5.5f), new Vector3(1.0f, 1.0f, 1.0f), 1.2f);
+                lights.Add(light3);
+
+
                 game_objects.Add(
                     new GameObject(
                         new Texture(frame),
@@ -233,6 +244,9 @@ namespace Game {
                     )
                 );
 
+                Light light4 = new Light(new Vector3(3.0f, 4.5f, 5.5f), new Vector3(1.0f, 1.0f, 1.0f), 1.2f);
+                lights.Add(light4);
+
                 game_objects.Add(
                     new GameObject(
                         new Texture(frame),
@@ -253,6 +267,9 @@ namespace Game {
                     )
                 );
 
+                Light light5 = new Light(new Vector3(4.0f, 4.5f, -5.5f), new Vector3(1.0f, 1.0f, 1.0f), 1.2f);
+                lights.Add(light5);
+
                 game_objects.Add(
                     new GameObject(
                         new Texture(frame),
@@ -272,6 +289,9 @@ namespace Game {
                         0.1f
                     )
                 );
+
+                Light light6 = new Light(new Vector3(-4.0f, 4.5f, -5.5f), new Vector3(1.0f, 1.0f, 1.0f), 1.2f);
+                lights.Add(light6);
 
                 game_objects.Add(
                     new GameObject(
@@ -331,10 +351,8 @@ namespace Game {
             // Подготовка трансформации: только модель
             Matrix4 model = camera.GetModelMatrix(new Vector3(0f, 0f, -2f)) * Matrix4.CreateScale(0.1f); // Применяем трансляцию объекта
 
-            Light light = new Light(new Vector3(0.0f, 5.0f, 0.0f), new Vector3(1.0f, 1.0f, 1.0f));
-
             // Передаем матрицы в шейдер
-            shader_program.setTransformationMatrices(model, camera, light);
+            shader_program.setTransformationMatrices(model, camera, lights);
 
             for (int i = 0; i < game_objects.Count; i++) {
                 game_objects[i].render(shader_program);

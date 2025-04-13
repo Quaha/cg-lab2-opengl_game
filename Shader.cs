@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.OpenGL4;
+﻿using Assimp;
+using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
 namespace Game {
@@ -70,7 +71,9 @@ namespace Game {
             return shader_source;
         }
 
-        public void setTransformationMatrices(Matrix4 model, Camera camera, Light light) {
+        public void setTransformationMatrices(Matrix4 model, Camera camera, List<Light> lights) {
+            // Матрицы
+
             Matrix4 view = camera.GetViewMatrix();
             Matrix4 projection = camera.GetProjectionMatrix();
 
@@ -78,16 +81,23 @@ namespace Game {
             int viewLocation = GL.GetUniformLocation(shader_handle, "view");
             int projectionLocation = GL.GetUniformLocation(shader_handle, "projection");
 
-            int lightPositionLocation = GL.GetUniformLocation(shader_handle, "lightPosition");
-            int lightColourLocation = GL.GetUniformLocation(shader_handle, "lightColour");
-
-
             GL.UniformMatrix4(modelLocation, true, ref model);
             GL.UniformMatrix4(viewLocation, true, ref view);
             GL.UniformMatrix4(projectionLocation, true, ref projection);
 
-            GL.Uniform3(lightPositionLocation, light.getPosition());
-            GL.Uniform3(lightColourLocation, light.getColour());
+            // Источники света (ограничение до 8)
+            int count = Math.Min(lights.Count, 8);
+            GL.Uniform1(GL.GetUniformLocation(shader_handle, "lightCount"), count);
+
+            for (int i = 0; i < count; i++) {
+                string posName = $"lightPositions[{i}]";
+                string colName = $"lightColors[{i}]";
+                string powName = $"lightPower[{i}]";
+
+                GL.Uniform3(GL.GetUniformLocation(shader_handle, posName), lights[i].getPosition());
+                GL.Uniform3(GL.GetUniformLocation(shader_handle, colName), lights[i].getColour());
+                GL.Uniform1(GL.GetUniformLocation(shader_handle, powName), lights[i].getPower());
+            }
         }
 
         // Активация шейдерной программы
