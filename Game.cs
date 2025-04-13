@@ -53,10 +53,10 @@ namespace Game {
         protected void initObjects() {
             game_objects = new List<GameObject>();
 
-            string diamond = "../../../Textures/diamond.jpg";
-            string stone = "../../../Textures/stone.jpg";
-
             string wall = "../../../Textures/wall.png";
+            string wood = "../../../Textures/wood.jpg";
+
+            string frame = "../../../Textures/frame.jpg";
 
             string paint1 = "../../../Textures/painting1.jpg";
             string paint2 = "../../../Textures/painting2.png";
@@ -65,12 +65,13 @@ namespace Game {
             string paint5 = "../../../Textures/painting5.jpg";
             string paint6 = "../../../Textures/painting6.jpg";
 
-            string obj_pott = "../../../Objects/pott.obj";
-            string text_pott = "../../../Objects/pott.mtl";
+            string vase_obj = "../../../Objects/vase.obj";
+            string vase = "../../../Textures/vase.png";
 
+            // floor
             game_objects.Add(
                 new GameObject(
-                    new Texture(stone),
+                    new Texture(wood),
                     new Vector3(0.0f, 0.0f, 0.0f),
                     15.0f,
                     0.1f,
@@ -79,16 +80,48 @@ namespace Game {
                 )
             );
 
-            game_objects.Add(
-                new GameObject(
-                    obj_pott,
-                    new Texture(diamond),
-                    new Vector3(0.0f, 0.0f, 0.0f),
-                    0.1f
-                )
-            );
+            // vases
+            {
+                game_objects.Add(
+                    new GameObject(
+                        vase_obj,
+                        new Texture(vase),
+                        new Vector3(6.5f, 0.0f, 6.5f),
+                        0.01f
+                    )
+                );
 
-            game_objects.Add(
+                game_objects.Add(
+                    new GameObject(
+                        vase_obj,
+                        new Texture(vase),
+                        new Vector3(-6.5f, 0.0f, 6.5f),
+                        0.01f
+                    )
+                );
+
+                game_objects.Add(
+                    new GameObject(
+                        vase_obj,
+                        new Texture(vase),
+                        new Vector3(6.5f, 0.0f, -6.5f),
+                        0.01f
+                    )
+                );
+
+                game_objects.Add(
+                    new GameObject(
+                        vase_obj,
+                        new Texture(vase),
+                        new Vector3(-6.5f, 0.0f, -6.5f),
+                        0.01f
+                    )
+                );
+            }
+
+            // walls
+            {
+                game_objects.Add(
                 new GameObject(
                     new Texture(wall),
                     new Vector3(0.0f, 2.5f, -7.5f),
@@ -98,108 +131,162 @@ namespace Game {
                 )
             );
 
-            game_objects.Add(
-                new GameObject(
-                    new Texture(wall),
-                    new Vector3(0.0f, 2.5f, 7.5f),
-                    15.0f,
-                    5.0f,
-                    0.1f
-                )
-            );
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(wall),
+                        new Vector3(0.0f, 2.5f, 7.5f),
+                        15.0f,
+                        5.0f,
+                        0.1f
+                    )
+                );
 
-            game_objects.Add(
-                new GameObject(
-                    new Texture(wall),
-                    new Vector3(7.5f, 2.5f, 0),
-                    0.1f,
-                    5.0f,
-                    15.0f
-                )
-            );
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(wall),
+                        new Vector3(7.5f, 2.5f, 0),
+                        0.1f,
+                        5.0f,
+                        15.0f
+                    )
+                );
 
-            game_objects.Add(
-                new GameObject(
-                    new Texture(wall),
-                    new Vector3(-7.5f, 2.5f, 0),
-                    0.1f,
-                    5.0f,
-                    15.0f
-                )
-            );
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(wall),
+                        new Vector3(-7.5f, 2.5f, 0),
+                        0.1f,
+                        5.0f,
+                        15.0f
+                    )
+                );
+            }
 
-            game_objects.Add(
-                new GameObject(
-                    new Texture(wall),
-                    new Vector3(-7.5f, 2.5f, 0),
-                    0.1f,
-                    5.0f,
-                    15.0f
-                )
-            );
+            // paintings
+            {
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(paint1),
+                        new Vector3(-7.4f, 2.5f, 0),
+                        0.1f,
+                        2.5f,
+                        5.0f
+                    )
+                );
 
-            game_objects.Add(
-                new GameObject(
-                    new Texture(paint1),
-                    new Vector3(-7.4f, 2.5f, 0),
-                    0.1f,
-                    2.5f,
-                    5.0f
-                )
-            );
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(frame),
+                        new Vector3(-7.401f, 2.5f, 0),
+                        0.1f,
+                        2.6f,
+                        5.1f
+                    )
+                );
 
-            game_objects.Add(
-                new GameObject(
-                    new Texture(paint2),
-                    new Vector3(7.4f, 2.5f, 0),
-                    0.1f,
-                    2.5f,
-                    5.0f
-                )
-            );
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(paint2),
+                        new Vector3(7.4f, 2.5f, 0),
+                        0.1f,
+                        2.5f,
+                        5.0f
+                    )
+                );
+
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(frame),
+                        new Vector3(7.401f, 2.5f, 0),
+                        0.1f,
+                        2.6f,
+                        5.1f
+                    )
+                );
 
 
-            game_objects.Add(
-                new GameObject(
-                    new Texture(paint3),
-                    new Vector3(-4.0f, 2.5f, 7.4f),
-                    3.0f,
-                    3.0f,
-                    0.1f,
-                    false
-                )
-            );
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(paint3),
+                        new Vector3(-4.0f, 2.5f, 7.4f),
+                        3.0f,
+                        3.0f,
+                        0.1f,
+                        false
+                    )
+                );
 
-            game_objects.Add(
-                new GameObject(
-                    new Texture(paint6),
-                    new Vector3(3.0f, 2.5f, 7.4f),
-                    3.0f,
-                    4.0f,
-                    0.1f
-                )
-            );
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(frame),
+                        new Vector3(-4.0f, 2.5f, 7.401f),
+                        3.1f,
+                        3.1f,
+                        0.1f,
+                        false
+                    )
+                );
 
-            game_objects.Add(
-                new GameObject(
-                    new Texture(paint4),
-                    new Vector3(4.0f, 2.5f, -7.4f),
-                    5.0f,
-                    3.0f,
-                    0.1f
-                )
-            );
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(paint6),
+                        new Vector3(3.0f, 2.5f, 7.4f),
+                        3.0f,
+                        4.0f,
+                        0.1f
+                    )
+                );
 
-            game_objects.Add(
-                new GameObject(
-                    new Texture(paint5),
-                    new Vector3(-4.0f, 2.5f, -7.4f),
-                    5.0f,
-                    3.0f,
-                    0.1f
-                )
-            );
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(frame),
+                        new Vector3(3.0f, 2.5f, 7.401f),
+                        3.1f,
+                        4.1f,
+                        0.1f
+                    )
+                );
 
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(paint4),
+                        new Vector3(4.0f, 2.5f, -7.4f),
+                        5.0f,
+                        3.0f,
+                        0.1f
+                    )
+                );
+
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(frame),
+                        new Vector3(4.0f, 2.5f, -7.401f),
+                        5.1f,
+                        3.1f,
+                        0.1f
+                    )
+                );
+
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(paint5),
+                        new Vector3(-4.0f, 2.5f, -7.4f),
+                        5.0f,
+                        3.0f,
+                        0.1f
+                    )
+                );
+
+                game_objects.Add(
+                    new GameObject(
+                        new Texture(frame),
+                        new Vector3(-4.0f, 2.5f, -7.401f),
+                        5.1f,
+                        3.1f,
+                        0.1f
+                    )
+                );
+            }
         }
 
         protected override void OnLoad() {

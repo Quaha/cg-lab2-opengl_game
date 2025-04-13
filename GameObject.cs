@@ -294,39 +294,45 @@ namespace Game {
 
             // Загрузка модели из файла .obj
             var importer = new AssimpContext();
-            Scene scene = importer.ImportFile(modelPath, PostProcessSteps.Triangulate | PostProcessSteps.GenerateNormals);
+            Scene scene = importer.ImportFile(modelPath,
+                    PostProcessSteps.Triangulate |
+                    PostProcessSteps.GenerateSmoothNormals);
 
             List<float> vertexData = new List<float>();
-            List<uint> indexData = new List<uint>(); // Для индексов
+            List<uint> indexData = new List<uint>();
+            uint indexOffset = 0;
+            float scaleFactor = size;
 
-            var mesh = scene.Meshes[0]; // Работаем с первым мешем
-            vertex_count = mesh.VertexCount;
+            foreach (var mesh in scene.Meshes) {
+                for (int i = 0; i < mesh.Vertices.Count; i++) {
+                    var vertex = mesh.Vertices[i];
+                    var normal = mesh.Normals[i];
 
-            float scaleFactor = size;  // Масштабирование модели
-            for (int i = 0; i < mesh.Vertices.Count; i++) {
-                var vertex = mesh.Vertices[i];
-                var normal = mesh.Normals[i];
+                    // Масштабируем координаты
+                    vertex.X *= scaleFactor;
+                    vertex.Y *= scaleFactor;
+                    vertex.Z *= scaleFactor;
 
-                // Масштабируем координаты вершин
-                vertex.X *= scaleFactor;
-                vertex.Y *= scaleFactor;
-                vertex.Z *= scaleFactor;
-
-                // Позиция (x, y, z), Нормали (nx, ny, nz)
-                vertexData.Add(vertex.X);
-                vertexData.Add(vertex.Y);
-                vertexData.Add(vertex.Z);
-                vertexData.Add(normal.X);
-                vertexData.Add(normal.Y);
-                vertexData.Add(normal.Z);
-            }
-
-            // Извлекаем индексы
-            foreach (var face in mesh.Faces) {
-                foreach (var index in face.Indices) {
-                    indexData.Add((uint)index); // Преобразуем индекс в uint
+                    // Позиция и нормали
+                    vertexData.Add(vertex.X);
+                    vertexData.Add(vertex.Y);
+                    vertexData.Add(vertex.Z);
+                    vertexData.Add(normal.X);
+                    vertexData.Add(normal.Y);
+                    vertexData.Add(normal.Z);
                 }
+
+                // Индексы — с учётом смещения
+                foreach (var face in mesh.Faces) {
+                    foreach (var index in face.Indices) {
+                        indexData.Add(indexOffset + (uint)index);
+                    }
+                }
+
+                indexOffset += (uint)mesh.Vertices.Count;
             }
+
+            vertex_count = indexData.Count; // теперь считаем общее число индексов
 
             float[] vertexArray = vertexData.ToArray();
             uint[] indices = indexData.ToArray();
