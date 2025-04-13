@@ -32,10 +32,6 @@ namespace Game {
         protected Shader shader_program;
         protected FrameCounter fps_counter;
 
-        static bool vaseLoaded = false;
-        static int vaseVAO, vaseVBO;
-        static int vaseVertexCount = 0;
-
         public Game(int width, int height) : base(
             new GameWindowSettings(),
             new NativeWindowSettings {Title = "Art Gallery"})

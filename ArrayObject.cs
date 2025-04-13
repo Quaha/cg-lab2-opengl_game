@@ -32,7 +32,8 @@ namespace Game {
             unBind();
             GL.DeleteVertexArray(vao_handle);
         }
-
+        
+        // Приклеплеие буфферов к VAO
         public void attachBuffer(BufferObject buffer,
                                  int attributeIndex,
                                  int size,
