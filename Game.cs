@@ -74,6 +74,10 @@ namespace Game {
                     )
                 );
 
+                //game_objects[1].setRotation(new Vector3(MathHelper.DegreesToRadians(-30),
+                //                                        MathHelper.DegreesToRadians(45),
+                //                                        MathHelper.DegreesToRadians(45)));
+
                 game_objects.Add(
                     new GameObject(
                         vase_obj,

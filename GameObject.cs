@@ -22,6 +22,8 @@ namespace Game {
         uint[] indices;
         List<Vector2> texture_coords;
 
+        Vector3 rotation = Vector3.Zero;
+
         public GameObject(Texture texture, 
                           Vector3 position, 
                           float dx, 
@@ -291,13 +293,21 @@ namespace Game {
             position = newPosition;
         }
 
+        public void setRotation(Vector3 newRotation) {
+            rotation = newRotation;
+        }
+
         public Vector3 getPosition() { 
             return position;
         }
 
         public void render(Shader shader) {
             // Создание матрицы трансляции
-            Matrix4 model = Matrix4.CreateTranslation(position);
+            Matrix4 model =
+                Matrix4.CreateRotationX(rotation.X) *
+                Matrix4.CreateRotationY(rotation.Y) *
+                Matrix4.CreateRotationZ(rotation.Z) *
+                Matrix4.CreateTranslation(position);
 
             int model_location = GL.GetUniformLocation(shader.getHandle(), "model");
             GL.UniformMatrix4(model_location, true, ref model);
