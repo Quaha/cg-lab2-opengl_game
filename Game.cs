@@ -184,7 +184,7 @@ namespace Game {
                     )
                 );
 
-                Light light2 = new Light(new Vector3(5.5f, 4.5f, 0), new Vector3(1.0f, 1.0f, 1.0f), 1.2f);
+                Light light2 = new Light(new Vector3(5.5f, 4.5f, 0), new Vector3(1.0f, 0.5f, 0.5f), 1.2f);
                 lights.Add(light2);
 
                 game_objects.Add(
@@ -234,7 +234,7 @@ namespace Game {
                     )
                 );
 
-                Light light4 = new Light(new Vector3(3.0f, 4.5f, 5.5f), new Vector3(1.0f, 1.0f, 1.0f), 1.2f);
+                Light light4 = new Light(new Vector3(3.0f, 4.5f, 5.5f), new Vector3(0.5f, 1.0f, 1.0f), 1.2f);
                 lights.Add(light4);
 
                 game_objects.Add(
@@ -280,7 +280,7 @@ namespace Game {
                     )
                 );
 
-                Light light6 = new Light(new Vector3(-4.0f, 4.5f, -5.5f), new Vector3(1.0f, 1.0f, 1.0f), 1.2f);
+                Light light6 = new Light(new Vector3(-4.0f, 4.5f, -5.5f), new Vector3(0.4f, 1.0f, 0.3f), 1.2f);
                 lights.Add(light6);
 
                 game_objects.Add(

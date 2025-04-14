@@ -209,7 +209,7 @@ namespace Game {
 
             uint index_offset = 0;
 
-            float scaleFactor = size;
+            float scale_factor = size;
 
             foreach (var mesh in scene.Meshes) {
                 for (int i = 0; i < mesh.Vertices.Count; i++) {
@@ -217,9 +217,9 @@ namespace Game {
                     var normal = mesh.HasNormals ? mesh.Normals[i] : new Assimp.Vector3D(0, 1, 0);
 
                     // Масштабирование координат
-                    vertex.X *= scaleFactor;
-                    vertex.Y *= scaleFactor;
-                    vertex.Z *= scaleFactor;
+                    vertex.X *= scale_factor;
+                    vertex.Y *= scale_factor;
+                    vertex.Z *= scale_factor;
 
                     var v = new Vector3(vertex.X, vertex.Y, vertex.Z);
                     var n = new Vector3(normal.X, normal.Y, normal.Z);

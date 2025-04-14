@@ -30,7 +30,7 @@ namespace Game {
                             TextureParameterName.TextureMagFilter,
                             (int)TextureMagFilter.Nearest);
 
-            // Загрузка изображения с использованием StbImageSharp
+            // Загрузка изображения с StbImageSharp
             StbImage.stbi_set_flip_vertically_on_load(1); // Флаг отражения по вертикали
             ImageResult image = ImageResult.FromStream(File.OpenRead(path), ColorComponents.RedGreenBlueAlpha);
 

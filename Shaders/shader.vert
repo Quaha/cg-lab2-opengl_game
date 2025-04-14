@@ -1,4 +1,4 @@
-#version 460 core
+﻿#version 460 core
 
 layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec2 a_texture_coord;
@@ -19,5 +19,5 @@ void main() {
     
     frag_pos = world_pos.xyz;
     texture_coord = a_texture_coord;
-    normal = mat3(transpose(inverse(model))) * a_normal;
+    normal = a_normal;
 }
